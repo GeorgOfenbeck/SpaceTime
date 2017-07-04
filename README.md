@@ -1,61 +1,36 @@
-# Staging for Generic Programming in Space and Time
+# Staging for Generic Programming in Space and Time [![Build Status](https://travis-ci.org/GeorgOfenbeck/SpaceTime.svg?branch=master)](https://travis-ci.org/GeorgOfenbeck/SpaceTime)
 
 This github repository hosts the code used within my thesis work and my last publication.
 
-The thesis can be found here: [Thesis] https://drive.google.com/open?id=0B9SH4AFkecQFMnkzWi1IRGprSFE (temporary link till it is available within the ETH digital library)
+1. The thesis can be found here: [Thesis]( https://drive.google.com/open?id=0B9SH4AFkecQFMnkzWi1IRGprSFE) <sup>[1](#myfootnote1)</sup>
 
-The publication can be found here: (to be published)
+2. The publication can be found here: (to be published)
 
 The code itself is a major artifact of the thesis - I therefore encourage to explore it.
 
-The most important related work can be found in section
+I assume that the reader of this document is familiar with Scala and Leightweight Modular Staging, otherwise see the Background section.
 
-## Getting Started
+## Prerequisites
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+The only software pre-requirement is the [SBT](http://www.scala-sbt.org/) build tool.
 
-### Prerequisites
+## Navigating the Code
 
-What things you need to install the software and how to install them
+This section will give the reader a high level guide to browse the code and relate it to the publication / thesis.
 
-```
-Give examples
-```
+### Modified version of LMS
 
-### Installing
+This work utilizes a modified version of LMS found [here](https://github.com/GeorgOfenbeck/SpaceTime/tree/master/src/main/scala). The high level differences to the original [work](http://scala-lms.github.io/) are
 
-A step by step series of examples that tell you have to get a development env running
+1. Removed the dependency to [Scala Virtualized Compiler](https://github.com/TiarkRompf/scala-virtualized).
+   This removes the abilitie to overload constructs such as the if statement. The focus of this work is not on DSL's, therefore we prefer to work on the main fork of the compiler.
+2. Changed the reifying, codemotion, traversal, unparsing infrastructure in backend - splitting them in seperate passes that each yield a resulting state.
+3. Changed the handling of staged functions to work with only a single parameter and return type, which in turn expose nested staged values through type classes.
 
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
+Changes 1 and 2 are described in Section 6 of the thesis. Change 3 is explained in Section 4.8 in the thesis and in Section 3.6 of the paper.
 
 
 
-
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-
-
-[Background](#background)
-# Background
 
 
 
@@ -75,22 +50,16 @@ Add additional notes about how to deploy this on a live system
 
 Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
 
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
-
-## Authors
-
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
 ## Acknowledgments
 
-* Hat tip to anyone who's code was used
-* Inspiration
-* etc
+* This work would not have been possible without my PhD advisor [Markus Püschel](https://www.inf.ethz.ch/personal/markusp/)
+* The whole PhD thesis was heavily co-adviced by [Tiark  Rompf](https://tiarkrompf.github.io/) and this code is based of his work on [LMS](http://scala-lms.github.io/)
+* Many inspiring discusions within my former group at [ETH](https://acl.inf.ethz.ch/) influenced this work. In particular I colaborated often with [Alen Stojanov](https://acl.inf.ethz.ch/people/astojanov/) and our works are related.
+* Furthermore my interaction with the [LAMP](https://lamp.epfl.ch/) group at EPFL and with all the people from the [Institute of Computer Systems](http://www.cs.inf.ethz.ch/) influenced this work
+
+<a name="myfootnote1">1</a>: temporary link till it is available within the ETH digital library
+
