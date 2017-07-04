@@ -24,14 +24,22 @@ This work utilizes a modified version of LMS found [here](https://github.com/Geo
 
 1. Removed the dependency to [Scala Virtualized Compiler](https://github.com/TiarkRompf/scala-virtualized).
    This removes the abilitie to overload constructs such as the if statement. The focus of this work is not on DSL's, therefore we prefer to work on the main fork of the compiler.
-2. Changed the reifying, codemotion, traversal, unparsing infrastructure in backend - splitting them in seperate passes that each yield a resulting state.
+2. Changed the reifying, codemotion, traversal and unparsing infrastructure in the backend - splitting them in seperate passes that each yield a resulting state.
 3. Changed the handling of staged functions to work with only a single parameter and return type, which in turn expose nested staged values through type classes.
 
 Changes 1 and 2 are described in Section 6 of the thesis. Change 3 is explained in Section 4.8 in the thesis and in Section 3.6 of the paper.
 
 ### Introductory examples
 
-The examples used in chapter 3.1 of the paper and chapter 4.1 of the thesis can be found here
+The examples used in chapter 3.1 of the paper and chapter 4.1 of the thesis can be found [here](https://github.com/GeorgOfenbeck/SpaceTime/tree/master/src/main/PaperExamples). More concretly
+
+1. The [code snippets](https://github.com/GeorgOfenbeck/SpaceTime/blob/master/src/main/PaperExamples/PaperExamples.scala) used in the Section 2 of the paper / thesis.
+2. The [original](https://github.com/GeorgOfenbeck/SpaceTime/blob/master/src/main/RunExampleTest.scala) and [final implementation](https://github.com/GeorgOfenbeck/SpaceTime/blob/master/src/main/PaperExamples/Section3.scala) of of the time and space generic running example described in Section 3.1-3.12 of the paper and Section 4.1 - 4.12 of the thesis.
+
+Note that, unlike in both the paper and the thesis, we use abstract type members instead of type parameters in the implementation. While we considered the verbosity of the type parameters benefitial for the text, for a full fletched implementation they cause an unexceptable amount of boiler plate. We implemented the filter case study with both coding styles, and the tradeoff is very visible when comparing these two variants.
+
+The two variants can be found here:
+1.
 
 
 

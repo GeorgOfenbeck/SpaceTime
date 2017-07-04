@@ -16,13 +16,8 @@ class Section3 extends Section3Headers {
   override val codegen = new ScalaCodegen with EmitHeadInternalFunctionAsClass with ScalaGenPrimitivOps with ScalaGenSort_DSL with ScalaGenBooleanOps with ScalaGenIfThenElse {
     val IR: self.type = self
   }
-
   import Implicits._
-
-
   val tiling = 8
-
-
   def binsearch[R[_] : IRep](mix: MixHeader[R], check: Rep[Int], low: Int, high: Int): AC[R] = {
     val ev = implicitly[IRep[R]]
     val mid = low + (high - low)
