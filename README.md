@@ -29,6 +29,9 @@ This work utilizes a modified version of LMS found [here](https://github.com/Geo
 
 Changes 1 and 2 are described in Section 6 of the thesis. Change 3 is explained in Section 4.8 in the thesis and in Section 3.6 of the paper.
 
+### Introductory examples
+
+The examples used in chapter 3.1 of the paper and chapter 4.1 of the thesis can be found here
 
 
 
