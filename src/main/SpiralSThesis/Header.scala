@@ -1,3 +1,5 @@
+package SpiralSThesis
+
 import org.scala_lang.virtualized.SourceContext
 
 trait Header extends Skeleton {

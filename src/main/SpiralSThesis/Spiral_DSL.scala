@@ -1,26 +1,12 @@
 
+package SpiralSThesis
+
+
 import scala.lms._
 import scala.lms.internal._
 import scala.lms.ops._
 import scala.lms.targets.graphviz.GraphVizExport
 import scala.lms.targets.scalalike._
-
-class ComplexVector
-
-case class Complex(val re: Double, val im: Double) {
-  def +(rhs: Complex): Complex = {
-
-    Complex(re + rhs.re, im + rhs.im)
-  }
-
-  def -(rhs: Complex): Complex = {
-
-    Complex(re - rhs.re, im - rhs.im)
-  }
-
-  def *(rhs: Complex): Complex = Complex(re * rhs.re - im * rhs.im, re * rhs.im + im * rhs.re)
-
-}
 
 trait Spiral_DSL extends BaseExp with FunctionsExp with OrderingOpsExp with BooleanOpsExpOpt with IfThenElsePureExp with PurePrimitiveOpsExpOpt with ImplicitOpsExp with ScalaCompile {
 
