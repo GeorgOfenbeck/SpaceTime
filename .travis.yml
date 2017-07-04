@@ -14,7 +14,7 @@ cache:
 # Q: should we use sbt ++$TRAVIS_SCALA_VERSION test?
 
 after_success:
-  - "[[ $TRAVIS_PULL_REQUEST == 'false' && $TRAVIS_BRANCH == 'master'* ]]
+  - "[[ $TRAVIS_PULL_REQUEST == 'false' && $TRAVIS_BRANCH == 'master'* ]] && sbt publish"
 
 script:
   - sbt clean
