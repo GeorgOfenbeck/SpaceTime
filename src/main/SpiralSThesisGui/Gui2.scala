@@ -1,39 +1,11 @@
 package SpiralSThesisGui
 
-import scala.swing.SimpleSwingApplication
-import java.io._
-import javax.swing.{JPanel, JSlider}
-import javax.swing.event.ChangeListener
-
-import scala.swing._
-import scalaswingcontrib.event.TreeNodeSelected
-import scalaswingcontrib.tree.{InternalTreeModel, Tree}
-import scala.xml.{Node, XML}
-import scala.swing.{Action, BorderPanel, Button, Component, Dimension, GridPanel, Label, MainFrame, ScrollPane, SimpleSwingApplication, Swing, TabbedPane}
-import Swing.{Icon, pair2Dimension}
-import scalaswingcontrib.tree.{ExternalTreeModel, InternalTreeModel, Tree, TreeModel}
-import scalaswingcontrib.event.TreeNodeSelected
-import scala.collection.mutable
-import Tree.{Editor, Renderer}
-import scala.swing._
-import scala.swing.event._
-import scala.swing.Swing._
-import scala.swing.ListView._
-import scife.enumeration.dependent.Depend
-import scife.enumeration.{dependent, memoization}
-import dependent._
-import memoization._
-import org.jfree.chart.{ChartFactory, ChartPanel}
-import org.jfree.chart.axis.NumberAxis
-import org.jfree.chart.event.{ChartChangeListener, ChartProgressEvent, ChartProgressListener}
-import org.jfree.chart.plot.PlotOrientation
-import org.jfree.chart.renderer.xy.{XYLineAndShapeRenderer, XYSplineRenderer}
-
-import scala.swing.TabbedPane.Page
-import TabbedPane.Page
-import BorderPanel.Position._
-import scalax.chart.module.XYChartFactories
 import SpiralSThesis._
+
+import scala.swing.Swing.{pair2Dimension, _}
+import scala.swing.TabbedPane.Page
+import scala.swing.event._
+import scala.swing.{Action, Button, Dimension, Label, MainFrame, Swing, TabbedPane, _}
 
 /**
   * Created by rayda on 05-Jan-17.
@@ -265,7 +237,7 @@ object GuiThesis extends EnumTree with scalax.chart.module.Charting {
 
     def jtransform2(): Double = {
       import org.jtransforms.fft.DoubleFFT_1D
-      import org.jtransforms.utils.{CommonUtils, IOUtils}
+      import org.jtransforms.utils.IOUtils
       import org.scalameter._
 
       var sizes1D: Array[Long] = Array(Math.pow(2, cur_dft_size).toLong)

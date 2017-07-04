@@ -45,11 +45,8 @@ class CorewGlue(testsize: Int, //2^n
 
   def compile(): (Unit => Double) = {
     import scala.tools.nsc._
-    import scala.tools.nsc.util._
-    import scala.tools.nsc.reporters._
     import scala.tools.nsc.io._
-
-    import scala.tools.nsc.interpreter.AbstractFileClassLoader
+    import scala.tools.nsc.reporters._
 
 
     def setupCompiler(): Global = {
@@ -152,7 +149,7 @@ class CorewGlue(testsize: Int, //2^n
         case e: Exception => {
           println(e)
         }
-        case _ => ???
+        case _ : Throwable => ???
 
       }
       res

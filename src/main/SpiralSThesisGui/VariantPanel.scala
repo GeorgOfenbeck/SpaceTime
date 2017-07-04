@@ -1,46 +1,22 @@
 package SpiralSThesisGui
 
 
-
-import scala.swing.SimpleSwingApplication
-import java.io._
-import javax.swing.JPanel
 import javax.swing.event.ChangeListener
 
-import scala.swing._
-import scalaswingcontrib.event.TreeNodeSelected
-import scalaswingcontrib.tree.{InternalTreeModel, Tree}
-import scala.xml.{Node, XML}
-import scala.swing.{Action, BorderPanel, Button, Component, Dimension, GridPanel, Label, MainFrame, ScrollPane, SimpleSwingApplication, Swing, TabbedPane}
-import Swing.{Icon, pair2Dimension}
-import scalaswingcontrib.tree.{ExternalTreeModel, InternalTreeModel, Tree, TreeModel}
-import scalaswingcontrib.event.TreeNodeSelected
-import scala.collection.mutable
-import Tree.{Editor, Renderer}
-import scala.swing._
-import scala.swing.event._
-import scala.swing.Swing._
-import scala.swing.ListView._
-import scife.enumeration.dependent.Depend
-import scife.enumeration.{dependent, memoization}
-import dependent._
-import memoization._
-import org.jfree.chart.{ChartFactory, ChartPanel}
 import org.jfree.chart.axis.NumberAxis
 import org.jfree.chart.event.{ChartChangeListener, ChartProgressEvent, ChartProgressListener}
 import org.jfree.chart.plot._
 import org.jfree.chart.renderer.xy._
+import org.jfree.chart.{ChartFactory, ChartPanel}
 import org.jfree.data.xy._
 import org.jfree.ui._
 
-import scala.swing.TabbedPane.Page
-import TabbedPane.Page
-import BorderPanel.Position._
-import scalax.chart.module.XYChartFactories
+import scala.swing.{Component, Label, _}
+
 /**
   * Created by rayda on 06-Jan-17.
   */
-class VariantPanel  extends scala.swing.BoxPanel(Orientation.Vertical) with ChangeListener with ChartProgressListener with ChartChangeListener {
+class VariantPanel extends scala.swing.BoxPanel(Orientation.Vertical) with ChangeListener with ChartProgressListener with ChartChangeListener {
   self =>
 
   import java.awt.Color;
@@ -54,10 +30,9 @@ class VariantPanel  extends scala.swing.BoxPanel(Orientation.Vertical) with Chan
   val series: XYSeries = new XYSeries("jtransform")
 
 
-
   dataset.addSeries(series)
 
-  val chart1= ChartFactory.createScatterPlot("Performance of Variants",
+  val chart1 = ChartFactory.createScatterPlot("Performance of Variants",
     "Variant id", "GFlops/s", dataset, PlotOrientation.VERTICAL, true, true, false);
 
 

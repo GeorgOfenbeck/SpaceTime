@@ -1,32 +1,12 @@
 package SpiralSThesisGui
 
-import scala.swing.SimpleSwingApplication
-import java.io._
-
-import scala.swing._
-import scalaswingcontrib.event.TreeNodeSelected
-import scalaswingcontrib.tree.{InternalTreeModel, Tree}
-import scala.xml.{Node, XML}
-import scala.swing.{Action, BorderPanel, Button, Component, Dimension, GridPanel, Label, MainFrame, ScrollPane, SimpleSwingApplication, Swing, TabbedPane}
-import Swing.{Icon, pair2Dimension}
-import scalaswingcontrib.tree.{ExternalTreeModel, InternalTreeModel, Tree, TreeModel}
-import scalaswingcontrib.event.TreeNodeSelected
-import scala.collection.mutable
-import Tree.{Editor, Renderer}
-import scala.swing._
-import scala.swing.event._
-import scala.swing.Swing._
-import scala.swing.ListView._
-import scife.enumeration.dependent.Depend
-import scife.enumeration.{dependent, memoization}
-import dependent._
-import memoization._
-
 import scife.{enumeration => e}
 
-import scala.swing.TabbedPane.Page
-import TabbedPane.Page
-import BorderPanel.Position._
+import scala.collection.mutable
+import scala.swing.Swing.Icon
+import scala.swing.{SimpleSwingApplication, Swing}
+import scalaswingcontrib.tree.Tree.Renderer
+import scalaswingcontrib.tree.{InternalTreeModel, Tree}
 
 
 object Bla {
@@ -37,10 +17,6 @@ object Bla {
 
 object BreakDown {
   // DSL
-  import e._
-  import Enum._
-  import Depend._
-  import scife.util._
 
   trait Tree {
     def getsize(): Int
@@ -60,17 +36,12 @@ object BreakDown {
   }
 
 
-  import scife.enumeration.dependent.Depend
-  import scife.enumeration.{dependent, memoization}
-  import dependent._
-  import memoization._
-  import scife.util._
-
+  import scife.enumeration.dependent
+  import dependent.{Depend, _}
   import scife.{enumeration => e}
   // DSL
-  import e._
-  import Enum._
   import Depend._
+  import e._
 
   def RadixFreedom() = {
     val radix: DependFinite[Int, Vector[Int]] =
@@ -158,7 +129,6 @@ abstract class EnumTree extends SimpleSwingApplication {
     def variant2Map2(x: BreakDown.Tree, brmaps: BRMaps): (BRMaps, Int) = {
       x match {
         case BreakDown.Leaf(unroll, twid) => {
-          import brmaps._
           /*val nid2ids = id2ids.get(-1).fold(id2ids)(fb => id2ids + (-1 -> (-1, -1)))
           val nids2id = ids2id.get((-1, -1)).fold(ids2id)(fb => ids2id + ((-1, -1) -> -1))
           //val nid2radix = id2radix.get(-1).fold(id2radix)(fb => id2radix + ( -1 -> (-1,-1,-1)))

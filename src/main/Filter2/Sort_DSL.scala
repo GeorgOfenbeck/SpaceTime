@@ -5,10 +5,7 @@ package Filter2
 import scala.lms._
 import scala.lms.internal._
 import scala.lms.ops._
-import scala.lms.targets.graphviz.GraphVizExport
 import scala.lms.targets.scalalike._
-
-import Filter2.ImageH
 
 trait Sort_DSL  extends BaseExp with FunctionsExp with BooleanOpsExpOpt with IfThenElsePureExp with PurePrimitiveOpsExp with OrderingOpsExp with RangeOpsExp with ImplicitOpsExp with ScalaCompile {
 

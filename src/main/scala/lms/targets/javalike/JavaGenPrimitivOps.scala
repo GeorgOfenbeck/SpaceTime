@@ -72,7 +72,6 @@ trait JavaGenPrimitivOps extends JavaCodegen{
    case LongBinaryAnd(lhs,rhs) => Vector(emitValDef(tp, quote(lhs) + " & " + quote(rhs)))
    case LongBinaryXor(lhs,rhs) => Vector(emitValDef(tp, quote(lhs) + " ^ " + quote(rhs)))
    case LongShiftLeft(lhs,rhs) => Vector(emitValDef(tp, quote(lhs) + " << " + quote(rhs)))
-
    //case LongDoubleValue(lhs) => Vector(emitValDef(tp, quote(lhs) + ".doubleValue()")
    //case LongFloatValue(lhs) => Vector(emitValDef(tp, quote(lhs) + ".floatValue()")
    case LongToFloat(lhs) => Vector(emitValDef(tp, quote(lhs) + ".toFloat"))
