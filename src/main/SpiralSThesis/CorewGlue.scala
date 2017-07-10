@@ -3,25 +3,12 @@ package SpiralSThesis
 import java.io.{PrintWriter, StringWriter}
 import java.lang.reflect.InvocationTargetException
 
-/**
-  * Created by rayda on 03-Jan-17.
-  */
-class CorewGlue(testsize: Int, //2^n
-                radix_choice: Map[Int, Int],
-                static_size: Option[Int] = None, //actual size - not as power
-                interleaved: Boolean = false,
-                thread: Boolean = true,
-                base_default: Int = 0,
-                twid_inline: Boolean = true,
-                twid_default_precomp: Boolean = true,
-                validate: Boolean = true,
-                inplace: Boolean = false,
-                pignore_config: Boolean = false,
-                inputstride: Boolean = false,
-                pinline: Boolean = true,
-                splitradix: Boolean = true
-               ) extends Core( radix_choice, interleaved, thread, base_default, twid_inline, twid_default_precomp, inplace, inline = pinline, pignore_config, psplitradix = splitradix) {
-
+class CorewGlue(testsize: Int, radix_choice: Map[Int, Int], static_size: Option[Int] = None, interleaved: Boolean = false,
+                thread: Boolean = true, base_default: Int = 0, twid_inline: Boolean = true, twid_default_precomp: Boolean = true,
+                validate: Boolean = true, inplace: Boolean = false, pignore_config: Boolean = false, inputstride: Boolean = false,
+                pinline: Boolean = true, splitradix: Boolean = true)
+  extends Core(radix_choice, interleaved, thread, base_default, twid_inline, twid_default_precomp, inplace,
+    inline = pinline, pignore_config, psplitradix = splitradix) {
 
 
   val WHT: Boolean = false
@@ -33,15 +20,13 @@ class CorewGlue(testsize: Int, //2^n
 
   def iniGTSkeleton(precomp: Boolean): Stat = {
     val idIM: StatIMH = new StatIMH(0, 1, 0)
-    val dynIM = new StatIMH(sph(),sph(),sph())
+    val dynIM = new StatIMH(sph(), sph(), sph())
     val expose = if (interleaved) exposeInterleavedComplexVector else exposeComplexVector
-    val instride = if (inputstride) new Stat_GT_IM(dynIM,dynIM) else new Stat_GT_IM(idIM, idIM)
+    val instride = if (inputstride) new Stat_GT_IM(dynIM, dynIM) else new Stat_GT_IM(idIM, idIM)
     val inlb: AInt = if (inputstride) sph() else 1
     val t = new Stat(if (static_size.isDefined) static_size.get else sph(), lb = inlb, instride, None, if (thread) Some(4) else None, precomp, expose, false)
     t
-
   }
-
 
   def compile(): (Unit => Double) = {
     import scala.tools.nsc._
@@ -93,42 +78,22 @@ class CorewGlue(testsize: Int, //2^n
     stream2.println("\n}\n")
     val ingtpre = iniGTSkeleton(true)
     val esc2 = codegen.emitSource((ini(ingtpre)), "PreCompute", stream2)(exposeDyn(ingtpre), ingt.expdata)
-    //val esc = codegen.emitSource((DFTstart(ingt)), "testClass", stream2)(exposeDynGTSkeleton(ingt), exposeSingle)
     stream2.println("\n}}\n")
-
     if (dumpGeneratedCode) println(source)
-
-
     val run = new compiler.Run
-
     val fileSystem = new VirtualDirectory("vfs", None)
-
     compiler.settings.outputDirs.setSingleOutput(fileSystem)
-    //      compiler.genJVM.outputDir = fileSystem
-
     run.compileSources(List(new util.BatchSourceFile("<stdin>", source.toString)))
     reporter.printSummary()
-
     if (!reporter.hasErrors)
       println("compilation: ok")
     else
       println("compilation: had errors")
-
     reporter.reset
-    //output.reset
-
     val parent = this.getClass.getClassLoader
     val loader = new scala.tools.nsc.util.AbstractFileClassLoader(fileSystem, this.getClass.getClassLoader)
-
     val cls: Class[_] = loader.loadClass("SpiralS2")
-    /*loader.loadClass("SpiralS2.Twiddle")
-    loader.loadClass("SpiralS2.PreCompute")*/
-    //val cons = cls.getCon//cls.getConstructor()
-
-    //val main = cls.getMethod("main", classOf[Array[String]])
     val time = cls.getMethod("time")
-
-    //val obj: Unit => Unit = cons.newInstance().asInstanceOf[Unit => Unit]
     val f: Unit => Double = (u: Unit) => {
       var res: Double = 0.0
       try {
@@ -149,7 +114,7 @@ class CorewGlue(testsize: Int, //2^n
         case e: Exception => {
           println(e)
         }
-        case _ : Throwable => ???
+        case _: Throwable => ???
 
       }
       res
@@ -157,6 +122,7 @@ class CorewGlue(testsize: Int, //2^n
 
     f
   }
+
   def codeexport(path: String = "C:\\Phd\\git\\code\\SpiralSTarget\\src\\main\\Test.scala") = {
     //def codeexport(path: String = "F:\\Phd\\git\\code\\SpiralSTarget\\src\\main\\Test.scala") = {
     val stream2 = new java.io.PrintWriter(new java.io.FileOutputStream(path))
@@ -167,12 +133,10 @@ class CorewGlue(testsize: Int, //2^n
     if (twid_default_precomp) {
       val ingtpre = iniGTSkeleton(true)
       val esc2 = codegen.emitSource((ini(ingtpre)), "PreCompute", stream2)(exposeDyn(ingtpre), ingt.expdata)
-      //val esc = codegen.emitSource((DFTstart(ingt)), "testClass", stream2)(exposeDynGTSkeleton(ingt), exposeSingle)
     }
     stream2.println("\n}}\n")
     stream2.flush()
     stream2.close()
-    // graphexport()
   }
 
 
@@ -190,13 +154,10 @@ class CorewGlue(testsize: Int, //2^n
 
 
   def dumpCode(stream2: java.io.PrintWriter) = {
-
     val useddata = if (interleaved) "Array[Double]" else "ComplexVector"
-
     val parloopcode: String = {
       s"def parloop(size: Int, numTasks: Int, ini: $useddata, out: $useddata, body: (Int) => $useddata): $useddata = {\n      val r = (0 to size by (size / (Math.min(numTasks, size))))\n      val ranges1 = (r zip r.tail)\n      val last: (Int, Int) = (ranges1.last._1, size)\n      val ranges = ranges1.dropRight(1) :+ last\n\n      def blub(r: Range): Unit = {\n        r.map(\n          p => {\n            val t = (p)\n            body(t)\n          }\n        )\n      }\n\n      val tasks = ranges.map({ case (from, to) => common.task(blub(from until to)) })\n      tasks foreach {\n        _.join\n      }\n      out\n    }"
     }
-
     val data = if (!interleaved) "val input = (0 until size).foldLeft(new ComplexVector(new Array[Complex](size))) {\n          (acc, ele) => if (ele == i) acc.update(ele, one) else acc.update(ele, zero)\n        }\n        val out = new ComplexVector(new Array[Complex](size))" else
       "val input = (0 until size).foldLeft(new InterleavedVector(new Array[Double](2*size))) {\n          (acc, ele) => if (ele == i) acc.update(ele, one) else acc.update(ele, zero)\n        }\n        val out = new InterleavedVector(new Array[Double](2*size))"
 
@@ -229,7 +190,7 @@ class CorewGlue(testsize: Int, //2^n
 
       "\n  Twiddle.twindex = 0\n      Twiddle.precompbuffer = Vector.empty\n   Twiddle.dprecompbuffer = Vector.empty\n    " +
       (if (interleaved) "var res: InterleavedVector = new InterleavedVector(null); \nvar resx: Array[Double] = null;\n" else "var res: ComplexVector = null\nvar resx: ComplexVector = null ") +
-      (if (twid_default_precomp) "//VARIOUS PRE CALLS HERE\n  resx = pre." + call + "     // VARIOUS PRE CALLS HERE END\n  println(\"pre comp done\")\n   Twiddle.precomp = Twiddle.precompbuffer.toArray\n     Twiddle.dprecomp = Twiddle.TMap2preComp()\n    " else "" ) +
+      (if (twid_default_precomp) "//VARIOUS PRE CALLS HERE\n  resx = pre." + call + "     // VARIOUS PRE CALLS HERE END\n  println(\"pre comp done\")\n   Twiddle.precomp = Twiddle.precompbuffer.toArray\n     Twiddle.dprecomp = Twiddle.TMap2preComp()\n    " else "") +
       "val txy = for (j <- 0 until " + repeatsets + ") yield {\n" +
       "  var elapsedTime = System.nanoTime\n          var repeatsinner = 1000\n          for (inner <- 0 until repeatsinner) {\n\n            //VARIOUS CALLS HERE\n       resx = t." + call + "     // VARIOUS CALLS HERE END\n\n          }\n          elapsedTime = System.nanoTime - elapsedTime\n          elapsedTime = elapsedTime / repeatsinner\n          elapsedTime\n        }" +
       "//VARIOUS CALLS HERE\n       resx = t." + call + "     // VARIOUS CALLS HERE END\n\n        if (Settings.validate) {\n\n          for (c <- 0 until size) {\n            val c1 = res(c)\n            val c2 = if (Settings.WHT) Twiddle.WHT(size, c, i) else Twiddle.DFT(size, c, i)\n\n             val thres = 1E-3\n            if (Math.abs(c1.re - c2.re) > thres) {\n              println(s\"real diff pos $c\")\n              println(c1.re)\n              println(c2.re)\n              fail = true\n            }\n            if (Math.abs(c1.im - c2.im) > thres) {\n              println(s\"im diff pos $c\")\n              println(c1.im)\n              println(c2.im)\n              fail = true\n            }\n            \n          }\nassert(!fail)\n}\n   val seqtime = txy.min \n     println(s\"time: $seqtime ns\")\nseqtime     \n      \n \n      \n    }\n    //println(fftmatrix)\n    //val validate = Twiddle.DFT(size)\n    //println(validate)\n\n    /*var fail = false\n    val thres = 1E-3\n    for (i <- 0 until size)\n      for (j <- 0 until size) {\n        val c1 = fftmatrix(i)(j)\n        val c2 = validate(i)(j)\n        if (Math.abs(c1.re - c2.re) > thres) {\n          println(c1.re)\n          println(c2.re)\n          fail = true\n        }\n        if (Math.abs(c1.im - c2.im) > thres) {\n          println(c1.im)\n          println(c2.im)\n          fail = true\n        }\n      }*/\n\n   if (!fail)\n        println(size + \" WORKS!!!!\")\n\n      fftmatrix\n    }\n    println(\"timings\")\n    println(timings)\n    timings.head.head\n  }\n\n\n  time()/*val one = Complex(0, 0)\n  val two = Complex(0, 0)\n  val three = Complex(1, 0)\n  val four = Complex(0, 0)\n\n\n  val in = new ComplexVector(4)\n  val x1 = in.update(0, one)\n  val x2 = x1.update(1, two)\n  val x3 = x2.update(2, three)\n  val x4 = x3.update(3, four)\n\n  val out = new ComplexVector(4)\n  val res = t.apply(x4, out, 4, 0, Vector.empty, 0, Vector.empty, Vector.empty)\n  res.print()*/\n\n")

@@ -2,14 +2,11 @@ package SpiralSThesis
 
 import org.scala_lang.virtualized.SourceContext
 
-
 trait Skeleton extends Spiral_DSL{
 
   type NoRep[T] = T
 
-
   trait IRep[T[_]] extends RepBase[T] with StagedNum[T] with Conditionals[T]  with Comparisons[T] //with RangeFold[T] with ChooseStuff[T] with BooleanOps[T]
-
 
   implicit object cRep extends IRep[Rep] with isRepBase with RepNum with RepConditionals with RepComparisons //with RepRangeFold with RepChooseStuff with RepBooleanOps
 

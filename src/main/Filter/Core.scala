@@ -9,29 +9,33 @@ import scala.lms.internal._
 import scala.lms.ops._
 import scala.lms.targets.graphviz.GraphVizExport
 import scala.lms.targets.scalalike._
+import Filter2._
+
 
 class Core extends FilterHeader {
   self =>
   val emitGraph = new GraphVizExport {
     override val IR: self.type = self
   }
-  override val codegen = new ScalaCodegen with EmitHeadInternalFunctionAsClass with ScalaGenPrimitivOps with ScalaGenSort_DSL with ScalaGenBooleanOps with ScalaGenIfThenElse {
+  override val codegen = new ScalaCodegen with EmitHeadInternalFunctionAsClass with ScalaGenPrimitivOps with Filter2.ScalaGenSort_DSL with ScalaGenBooleanOps with ScalaGenIfThenElse {
     val IR: self.type = self
   }
 
+
+
   case class MaybeSFunction[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep]
-  (f: Either[StagedFunction[DynFilterHeader[T, A, B, C, D, E, F, G, H, I], Rep[Image]], DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[Image]]) {
-    def apply(dyn: DynFilterHeader[T, A, B, C, D, E, F, G, H, I]): Rep[Image] = f.fold(fa => fa(dyn), fb => fb(dyn))
+  (f: Either[StagedFunction[DynFilterHeader[T, A, B, C, D, E, F, G, H, I], Rep[ImageH]], DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[ImageH]]) {
+    def apply(dyn: DynFilterHeader[T, A, B, C, D, E, F, G, H, I]): Rep[ImageH] = f.fold(fa => fa(dyn), fb => fb(dyn))
   }
 
   object MaybeSFunction {
-    def apply[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](f: StagedFunction[DynFilterHeader[T, A, B, C, D, E, F, G, H, I], Rep[Image]]): MaybeSFunction[T, A, B, C, D, E, F, G, H, I] = MaybeSFunction(Left(f))
+    def apply[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](f: StagedFunction[DynFilterHeader[T, A, B, C, D, E, F, G, H, I], Rep[ImageH]]): MaybeSFunction[T, A, B, C, D, E, F, G, H, I] = MaybeSFunction(Left(f))
 
-    def apply[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](f: (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[Image])): MaybeSFunction[T, A, B, C, D, E, F, G, H, I] = MaybeSFunction(Right(f))
+    def apply[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](f: (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[ImageH])): MaybeSFunction[T, A, B, C, D, E, F, G, H, I] = MaybeSFunction(Right(f))
   }
 
-  def multiplya[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](stat: StatFilterHeader[T, A, B, C, D, E, F, G, H, I]): (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[Image]) = {
-    val stageme: (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[Image]) = (dyn: DynFilterHeader[T, A, B, C, D, E, F, G, H, I]) => {
+  def multiplya[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](stat: StatFilterHeader[T, A, B, C, D, E, F, G, H, I]): (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[ImageH]) = {
+    val stageme: (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[ImageH]) = (dyn: DynFilterHeader[T, A, B, C, D, E, F, G, H, I]) => {
       val f = multiply(stat)
       val t = f(dyn)
       t
@@ -42,8 +46,8 @@ class Core extends FilterHeader {
 
   def multiply[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](stat: StatFilterHeader[T, A, B, C, D, E, F, G, H, I]): MaybeSFunction[T, A, B, C, D, E, F, G, H, I] = {
     val exposarg: ExposeRep[DynFilterHeader[T, A, B, C, D, E, F, G, H, I]] = exposeDynHeader(stat)
-    implicit val exposeret = exposeRepFromRep[Image]
-    val stageme: (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[Image]) = (dyn: DynFilterHeader[T, A, B, C, D, E, F, G, H, I]) => {
+    implicit val exposeret = exposeRepFromRep[ImageH]
+    val stageme: (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[ImageH]) = (dyn: DynFilterHeader[T, A, B, C, D, E, F, G, H, I]) => {
 
       val mix = MixFilterHeader(stat, dyn)
       import mix._
@@ -244,7 +248,7 @@ class Core extends FilterHeader {
     if (stat.inline.inline) {
       MaybeSFunction(stageme)
     } else {
-      val t: StagedFunction[DynFilterHeader[T, A, B, C, D, E, F, G, H, I], Rep[Image]] = doGlobalLambda(stageme, Some("Filter" + stat.genSig()), Some("Filter" + stat.genSig()))(exposarg, exposeret)
+      val t: StagedFunction[DynFilterHeader[T, A, B, C, D, E, F, G, H, I], Rep[ImageH]] = doGlobalLambda(stageme, Some("Filter" + stat.genSig()), Some("Filter" + stat.genSig()))(exposarg, exposeret)
       MaybeSFunction(t)
     }
   }
@@ -267,8 +271,8 @@ class Core extends FilterHeader {
 
   def multiply_dec[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](stat: StatFilterHeader[T, A, B, C, D, E, F, G, H, I]): MaybeSFunction[T, A, B, C, D, E, F, G, H, I] = {
     val exposarg: ExposeRep[DynFilterHeader[T, A, B, C, D, E, F, G, H, I]] = exposeDynHeader(stat)
-    implicit val exposeret = exposeRepFromRep[Image]
-    val stageme: (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[Image]) = (dyn: DynFilterHeader[T, A, B, C, D, E, F, G, H, I]) => {
+    implicit val exposeret = exposeRepFromRep[ImageH]
+    val stageme: (DynFilterHeader[T, A, B, C, D, E, F, G, H, I] => Rep[ImageH]) = (dyn: DynFilterHeader[T, A, B, C, D, E, F, G, H, I]) => {
 
       val mix = MixFilterHeader(stat, dyn)
       import mix._
@@ -466,7 +470,7 @@ class Core extends FilterHeader {
     if (stat.inline.inline) {
       MaybeSFunction(stageme)
     } else {
-      val t: StagedFunction[DynFilterHeader[T, A, B, C, D, E, F, G, H, I], Rep[Image]] = doGlobalLambda(stageme, Some("Filter" + stat.genSig()), Some("Filter" + stat.genSig()))(exposarg, exposeret)
+      val t: StagedFunction[DynFilterHeader[T, A, B, C, D, E, F, G, H, I], Rep[ImageH]] = doGlobalLambda(stageme, Some("Filter" + stat.genSig()), Some("Filter" + stat.genSig()))(exposarg, exposeret)
       MaybeSFunction(t)
     }
   }
@@ -479,7 +483,7 @@ class Core extends FilterHeader {
     val inline = InlineInfo(false, 10, true, false, true, 0)
     val ini = StatFilterHeader[Int, Rep, Rep, Rep, Rep, Rep, Rep, Rep, Rep, Rep](Const(-1), Const(-1), Const(-1), Const(-1), Const(-1), Const(-1), Const(-1), Const(-1), Const(-1), inline)
     //val ini: StatKaratsubaHeader[Rep,Rep,Rep,Rep,Rep,Rep] = StatKaratsubaHeader[Rep,Rep,Rep,Rep,Rep,Rep](Const(-1), Const(-1), Const(-1),Const(-1))
-    val esc = codegen.emitSource(multiplya(ini), "testClass", stream2)(exposeDynHeader(ini), exposeRepFromRep[Image])
+    val esc = codegen.emitSource(multiplya(ini), "testClass", stream2)(exposeDynHeader(ini), exposeRepFromRep[ImageH])
     stream2.println("\n}\n")
     stream2.flush()
     stream2.close()

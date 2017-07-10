@@ -1,8 +1,5 @@
 package SpiralSThesis
 
-/**
-  * Created by rayda on 29-Dec-16.
-  */
 object Twiddle {
 
   var TMap = Map.empty[(Int, Int, Int), ComplexVector]
@@ -33,7 +30,6 @@ object Twiddle {
 
     for (i <- 0 until root_list_re.size) {
       val u = Complex(root_list_re(i), root_list_im(i))
-      //val idx = vrep(yi)f
       val tx = x.apply(i)
       x.update(i, tx * u)
     }
@@ -68,7 +64,6 @@ object Twiddle {
       m(x) = new ComplexVector(new Array[Complex](n))
     for (x <- 0 until n)
       for (y <- 0 until n) {
-
         m(x).update(y, new Complex(t_e.re(x * y * k), t_e.im(x * y * k)))
       }
     m.toVector
@@ -171,11 +166,11 @@ class E(val n: Int) {
       if (xn > yn / 2) {
         // normalization in Pi, achieving 0 <= xn / yn <= 1/2
         val (xp, yp) = normalize_pi_over2_shift(xn, yn)
-        if (trig) normalize_trig(sign * (+1), false, xp, yp)else normalize_trig(sign * (-1), true, xp, yp)
+        if (trig) normalize_trig(sign * (+1), false, xp, yp) else normalize_trig(sign * (-1), true, xp, yp)
 
       } else if (xn == yn / 2) {
         if (trig) (sign, true, xn, yn, sign * (+1.0)) else
-        (sign, false, xn, yn, sign * (+0.0))
+          (sign, false, xn, yn, sign * (+0.0))
 
       } else {
         // now reflect in Pi / 2, and make sure that 0 <= xn / yn <= 1/4
@@ -200,13 +195,13 @@ class E(val n: Int) {
 
   private def valueSinOrCos(f: Boolean, x: Double, y: Double): Double = {
     val (sign, trig, xn, yn, value) = normalize_trig(1, f, x, y)
-    if (!value.equals(scala.Double.MaxValue))  value  else {
+    if (!value.equals(scala.Double.MaxValue)) value else {
       if (trig)
         (xn, yn) match {
           case (1.0, 6.0) => sign * 0.5
           case _ => sign * Math.sin(xn * Math.PI / yn)
         }
-        else sign * Math.cos(xn * Math.PI / yn)
+      else sign * Math.cos(xn * Math.PI / yn)
 
     }
   }
@@ -215,7 +210,7 @@ class E(val n: Int) {
 
   def CosPi(x: Double, y: Double): Double = valueSinOrCos(false, x, y)
 
-  private def yieldk(n: Int) :Int = {
+  private def yieldk(n: Int): Int = {
     var k = n
     var nonzero = true
     while (k > 0 && nonzero) {
@@ -230,37 +225,23 @@ class E(val n: Int) {
     }
     k
   }
-
   lazy val store = yieldk(n)
 
-  def re(p: Int): Double = {
-    val x = CosPi(2.0 * p * store, n)
-    x
-  }
+  def re(p: Int): Double = CosPi(2.0 * p * store, n)
 
   def im(p: Int): Double = SinPi(2.0 * p * store, n) * -1.0
 }
 
 
 case class Complex(val re: Double, val im: Double) {
-  def +(rhs: Complex): Complex = {
+  def +(rhs: Complex): Complex = Complex(re + rhs.re, im + rhs.im)
 
-    Complex(re + rhs.re, im + rhs.im)
-  }
-
-  def -(rhs: Complex): Complex = {
-
-    Complex(re - rhs.re, im - rhs.im)
-  }
+  def -(rhs: Complex): Complex = Complex(re - rhs.re, im - rhs.im)
 
   def *(rhs: Complex): Complex = Complex(re * rhs.re - im * rhs.im, re * rhs.im + im * rhs.re)
-
 }
 
 class ComplexVector(val save: Array[Complex]) extends AnyVal {
-  //class ComplexVector(n: Int) extends AnyVal{
-  //val save = new Array[Complex](n)
-
   def apply(i: Int): Complex = save(i)
 
   def update(i: Int, y: Complex): ComplexVector = {

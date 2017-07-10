@@ -1,10 +1,10 @@
 package Filter
-class Image
+import Filter2._
 
 /**
   * Created by rayda on 27-Oct-16.
   */
-trait FilterHeader extends Skeleton {
+trait FilterHeader extends Filter2.Skeleton {
 
   case class InlineInfo(inline: Boolean, maxfunctions: Int, compareinline: Boolean, consider_inline: Boolean, specialize: Boolean, spezialize_done: Int)
 
@@ -36,7 +36,7 @@ trait FilterHeader extends Skeleton {
 
   }
 
-  class DynFilterHeader[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](val image_in: Rep[Image], val image_out: Rep[Image], a: A[T], b: B[T], c: C[T], d: D[T], e: E[T], f: F[T], g: G[T], h: H[T], i: I[T]) extends FilterHeader(a, b, c, d, e, f, g, h, i) with DynSelector
+  class DynFilterHeader[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](val image_in: Rep[ImageH], val image_out: Rep[ImageH], a: A[T], b: B[T], c: C[T], d: D[T], e: E[T], f: F[T], g: G[T], h: H[T], i: I[T]) extends FilterHeader(a, b, c, d, e, f, g, h, i) with DynSelector
 
   class StatFilterHeader[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](a: A[T], b: B[T], c: C[T], d: D[T], e: E[T], f: F[T], g: G[T], h: H[T], i: I[T], val inline: InlineInfo) extends FilterHeader(a, b, c, d, e, f, g, h, i) with StatSelector {
     def genSig(): String = {
@@ -85,7 +85,7 @@ trait FilterHeader extends Skeleton {
     def apply[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](a: A[T], b: B[T], c: C[T], d: D[T], e: E[T], f: F[T], g: G[T], h: H[T], i: I[T], inline: InlineInfo): StatFilterHeader[T, A, B, C, D, E, F, G, H, I] = new StatFilterHeader(a, b, c, d, e, f, g, h, i, inline)
   }
 
-  case class MixFilterHeader[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](image_in: Rep[Image] , image_out: Rep[Image], a: A[T], b: B[T], c: C[T], d: D[T], e: E[T], f: F[T], g: G[T], h: H[T], i: I[T], inline: InlineInfo) extends Base(a, b, c, d, e, f, g, h, i) {
+  case class MixFilterHeader[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](image_in: Rep[ImageH] , image_out: Rep[ImageH], a: A[T], b: B[T], c: C[T], d: D[T], e: E[T], f: F[T], g: G[T], h: H[T], i: I[T], inline: InlineInfo) extends Base(a, b, c, d, e, f, g, h, i) {
     def getDynHeader(): DynFilterHeader[T, A, B, C, D, E, F, G, H, I] = new DynFilterHeader[T, A, B, C, D, E, F, G, H, I](image_in, image_out,a, b, c, d, e, f, g, h, i)
 
     def getStatHeader(): StatFilterHeader[T, A, B, C, D, E, F, G, H, I] = new StatFilterHeader[T, A, B, C, D, E, F, G, H, I](a, b, c, d, e, f, g, h, i, inline)
@@ -113,7 +113,7 @@ trait FilterHeader extends Skeleton {
 
   implicit def exposeDynHeader[T: Numeric : TypeRep, A[_] : IRep, B[_] : IRep, C[_] : IRep, D[_] : IRep, E[_] : IRep, F[_] : IRep, G[_] : IRep, H[_] : IRep, I[_] : IRep](stat: StatFilterHeader[T, A, B, C, D, E, F, G, H, I]): ExposeRep[DynFilterHeader[T, A, B, C, D, E, F, G, H, I]] = new ExposeRep[DynFilterHeader[T, A, B, C, D, E, F, G, H, I]]{
     val freshExps: Unit => Vector[Exp[_]] = (u: Unit) => {
-      Vector(Arg[Image]) ++ Vector(Arg[Image]) ++
+      Vector(Arg[ImageH]) ++ Vector(Arg[ImageH]) ++
       implicitly[IRep[A]].fresh[T]() ++
         implicitly[IRep[B]].fresh[T]() ++
         implicitly[IRep[C]].fresh[T]() ++
@@ -145,8 +145,8 @@ trait FilterHeader extends Skeleton {
         val res: T[A] = ele.getOrElse(statele.get)
         (vecafter, res)
       }
-      val image_in = in.head.asInstanceOf[Rep[Image]]
-      val image_out = in.tail.head.asInstanceOf[Rep[Image]]
+      val image_in = in.head.asInstanceOf[Rep[ImageH]]
+      val image_out = in.tail.head.asInstanceOf[Rep[ImageH]]
       val (oa, a) = help(in.tail.tail, stat.a, implicitly[IRep[A]])
       val (ob, b) = help(oa, stat.b, implicitly[IRep[B]])
       val (oc, c) = help(ob, stat.c, implicitly[IRep[C]])

@@ -1,7 +1,5 @@
 package Filter2
 
-
-
 import scala.lms._
 import scala.lms.internal._
 import scala.lms.ops._
