@@ -73,8 +73,8 @@ trait FunctionsExp extends Functions with BaseExp with ClosureCompare with Effec
             }
           }
         }
-        val tagnew = helper[_ => _]
-        val lambda: Exp[Function[_, _]] = Arg[_ => _](tagnew)
+        val tagnew = helper[Any => Any]
+        val lambda: Exp[Function[Any, Any]] = Arg[Any => Any](tagnew)
         Vector(lambda)
       }
       val vec2t: Vector[Exp[_]] => StagedFunction[A, R] = (in: Vector[Exp[_]]) => {

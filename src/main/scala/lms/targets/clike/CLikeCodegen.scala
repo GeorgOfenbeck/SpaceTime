@@ -5,6 +5,8 @@ package clike
 import java.io.PrintWriter
 
 import scala.lms.internal._
+import scala.reflect._
+import scala.reflect.runtime.universe._
 
 trait CLikeCodegen extends GenericCodegen with Config {
   self =>
@@ -30,7 +32,7 @@ trait CLikeCodegen extends GenericCodegen with Config {
     else ""
   }
 
-  def remapWithRef[A](m: Manifest[A]): String = remap(m) + addRef(m)
+  def remapWithRef[A](m: TypeTag[A]): String = remap(m) + addRef(m)
   def remapWithRef(tpe: String): String = tpe + addRef(tpe)
   def isPrimitiveType(tpe: String) : Boolean = {
     tpe match {
@@ -44,7 +46,7 @@ trait CLikeCodegen extends GenericCodegen with Config {
   }
 
   def addRef(): String = if (cppMemMgr=="refcnt") " " else " *"
-  def addRef[A](m: Manifest[A]): String = addRef(remap(m))
+  def addRef[A](m: TypeTag[A]): String = addRef(remap(m))
   def addRef(tpe: String): String = {
     if (!isPrimitiveType(tpe) && !isVoidType(tpe)) addRef()
     else " "

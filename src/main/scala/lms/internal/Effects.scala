@@ -2,6 +2,9 @@ package scala.lms.internal
 
 import org.scala_lang.virtualized.SourceContext
 import scala.collection.mutable
+import scala.reflect._
+import scala.reflect.runtime.universe._
+
 
 trait EffectSummary extends Expressions {
 
@@ -115,14 +118,14 @@ trait Effects extends Functions with Blocks with Logging {
   // --- summary
 
 
-  def reflectMutable[A: Manifest](d: Def[A])(implicit pos: SourceContext): Exp[A] = {
+  def reflectMutable[A: TypeTag](d: Def[A])(implicit pos: SourceContext): Exp[A] = {
     val z = reflectEffect(d, Alloc())
     val mutableAliases = mutableTransitiveAliases(d)
     checkIllegalSharing(z, mutableAliases)
     z
   }
 
-  def checkIllegalSharing(z: Exp[_], mutableAliases: Vector[Exp[_]]) {
+  def checkIllegalSharing(z: Exp[_], mutableAliases: Vector[Exp[_]]): Unit =  {
     if (mutableAliases.nonEmpty) {
       val zd = z match {
         case Def(zd) => zd

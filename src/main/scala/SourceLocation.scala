@@ -38,7 +38,7 @@ object SourceLocation {
                                        override val charOffset: Int,
                                        override val fileName: String)
   extends SourceLocation {
-    def this(line: Int, file: String) {
+    def this(line: Int, file: String) = {
       this(line, 0, file)
     }
   }

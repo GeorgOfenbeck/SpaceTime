@@ -1,4 +1,6 @@
 package scala.lms
+import scala.reflect._
+import scala.reflect.runtime.universe._
 
 /**
  * Component for abstraction over the run-time representation of types. The `TypeRep` abstraction
@@ -9,22 +11,22 @@ package scala.lms
  */
 trait TypeRepBase {
  trait TypeRep[T] {
-  def mf: Manifest[T]
+  def mf: TypeTag[T]
 
-  def typeArguments: List[Manifest[_]]
-  def arrayManifest: Manifest[Array[T]]
+  def typeArguments: List[TypeTag[_]]
+  def arrayManifest: TypeTag[Array[T]]
   def runtimeClass: java.lang.Class[_]
-  def erasure: java.lang.Class[_]
-  def <:<(that: TypeRep[_]): Boolean
+  //def erasure: java.lang.Class[_]
+  //def <:<(that: TypeRep[_]): Boolean
   def dynTags: Option[ Unit => (Vector[TypeRep[_]],Vector[TypeRep[_]])]
  }
 
- case class TypeExp[T](mf: Manifest[T], dynTags: Option[ Unit => (Vector[TypeRep[_]],Vector[TypeRep[_]])] = None) extends TypeRep[T] {
-  def typeArguments: List[Manifest[_]]   = mf.typeArguments
-  def arrayManifest: Manifest[Array[T]] = mf.arrayManifest
+ case class TypeExp[T](mf: TypeTag[T], dynTags: Option[ Unit => (Vector[TypeRep[_]],Vector[TypeRep[_]])] = None) extends TypeRep[T] {
+  def typeArguments: List[TypeTag[_]]   = mf.typeArguments
+  def arrayManifest: TypeTag[Array[T]] = mf.arrayManifest
   def runtimeClass: java.lang.Class[_] = mf.runtimeClass
-  def <:<(that: TypeRep[_]): Boolean = mf.<:<(that.mf)
-  def erasure: java.lang.Class[_] = mf.erasure
+  //def <:<(that: TypeRep[_]): Boolean = mf.<:<(that.mf)
+  //def erasure: java.lang.Class[_] = mf.erasure
   override def canEqual(that: Any): Boolean = mf.canEqual(that)
   override def equals(that: Any): Boolean = mf.equals(that)
   override def hashCode = mf.hashCode
@@ -32,8 +34,8 @@ trait TypeRepBase {
  }
 
  def typeRep[T](implicit tr: TypeRep[T]): TypeRep[T] = tr
- implicit def typeRepFromManifest[T](implicit mf: Manifest[T]): TypeRep[T] = TypeExp(mf)
- implicit def convertFromManifest[T](mf: Manifest[T]): TypeRep[T] = TypeExp(mf)
+ implicit def typeRepFromManifest[T](implicit mf: TypeTag[T]): TypeRep[T] = TypeExp(mf)
+ implicit def convertFromManifest[T](mf: TypeTag[T]): TypeRep[T] = TypeExp(mf)
 }
 
 
@@ -49,8 +51,11 @@ trait Base extends TypeRepBase {
  protected def unit[T:TypeRep](x: T): Rep[T]            //TODO - why protected??
 
  // always lift Unit and Null (for now)
- implicit def unitToRepUnit(x: Unit) = unit(x)
- implicit def nullToRepNull(x: Null) = unit(x)
+ implicit def unitToRepUnit(x: Unit): Rep[Unit] = {
+  val tr = typeRep[Unit]
+  unit(x)(tr)
+ }
+ implicit def nullToRepNull(x: Null): Rep[Null] = unit(x)
  def typeRep[T](implicit tr: TypeRep[T]): TypeRep[T]
 
 

@@ -9,14 +9,14 @@ trait ClosureCompare extends Externalizable {
  // the whole thing must be serializable, since embedded closures
  // might refer to the context.
 
- def writeExternal(out: ObjectOutput) {
+ def writeExternal(out: ObjectOutput): Unit = {
   //    println("in write object")
  }
- def readExternal(in: ObjectInput) {
+ def readExternal(in: ObjectInput): Unit =  {
   throw new NotSerializableException("this is just a mock-up!")
  }
 
- def canonicalize[A,R](f: Function[A,R]) = {
+ def canonicalize[A,R](f: Function[A,R]): String = {
    //println(f.pickle.value)
   //println(f.toJson.prettyPrint)
   val s = new java.io.ByteArrayOutputStream()

@@ -10,7 +10,7 @@ import scala.tools.nsc.io._
 import scala.tools.nsc.interpreter.AbstractFileClassLoader
 
 trait ScalaCompile {
-
+  /*
   val codegen: ScalaCodegen with TupleHelper
 
   var compiler: Global = _
@@ -94,7 +94,7 @@ trait ScalaCompile {
     val obj: Any=>Any = cons.newInstance(staticData.map(_._2.asInstanceOf[AnyRef]):_*).asInstanceOf[Any=>Any]
     //GO: making this any to any since we unparse into Tuples not A=>R
     (obj,esc)
-  }
+  } */
 
 
 }
