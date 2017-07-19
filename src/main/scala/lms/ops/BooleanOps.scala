@@ -9,7 +9,7 @@ import scala.lms.internal.FunctionsExp
 trait LiftBoolean {
   this: Base =>
 
-  implicit def boolToBoolRep(b: Boolean) = unit(b)
+  implicit def boolToBoolRep(b: Boolean): Rep[Boolean] = unit(b)
 }
 
 trait BooleanOps extends Base {

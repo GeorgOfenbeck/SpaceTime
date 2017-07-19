@@ -7,15 +7,17 @@ import org.scala_lang.virtualized.SourceContext
 import scala.lms.internal.Expressions
 import util.OverloadHack
 
+/*
 
 trait LiftPrimitives {
   this: PurePrimitiveOpsExp =>
 
-  implicit def intToRepInt(x: Int) = unit(x)
-  implicit def floatToRepFloat(x: Float) = unit(x)
-  implicit def doubleToRepDouble(x: Double) = unit(x)
-  implicit def longToRepLong(x: Long) = unit(x)
+  implicit def intToRepInt(x: Int): Rep[Int] = unit(x)
+  implicit def floatToRepFloat(x: Float): Rep[Float] = unit(x)
+  implicit def doubleToRepDouble(x: Double): Rep[Double] = unit(x)
+  implicit def longToRepLong(x: Long): Rep[Long] = unit(x)
 }
+*/
 
 /**
  * This file is extremely boilerplate. In fact, most of the code here is copied from a
@@ -43,8 +45,8 @@ trait PurePrimitiveOps extends OverloadHack {
 
   // -- BEGIN FORGE-GENERATED SECTION
 
-  implicit def repToPrimitiveMathOpsDoubleOpsCls(x: Rep[Double])(implicit __pos: SourceContext) = new PrimitiveMathOpsDoubleOpsCls(x)(__pos)
-  implicit def liftToPrimitiveMathOpsDoubleOpsCls(x: Double)(implicit __pos: SourceContext) = new PrimitiveMathOpsDoubleOpsCls(unit(x))(__pos)
+  implicit def repToPrimitiveMathOpsDoubleOpsCls(x: Rep[Double])(implicit __pos: SourceContext):PrimitiveMathOpsDoubleOpsCls = new PrimitiveMathOpsDoubleOpsCls(x)(__pos)
+  implicit def liftToPrimitiveMathOpsDoubleOpsCls(x: Double)(implicit __pos: SourceContext):PrimitiveMathOpsDoubleOpsCls = new PrimitiveMathOpsDoubleOpsCls(unit(x))(__pos)
 
 
   class PrimitiveMathOpsDoubleOpsCls(val self: Rep[Double])(implicit __pos: SourceContext) {
@@ -98,8 +100,8 @@ trait PurePrimitiveOps extends OverloadHack {
     def /(rhs: Var[Long])(implicit __pos: SourceContext,__imp1: Overloaded21) = { double_divide(self, readVar(rhs).toDouble) }*/
   }
 
-  implicit def repToPrimitiveMathOpsFloatOpsCls(x: Rep[Float])(implicit __pos: SourceContext) = new PrimitiveMathOpsFloatOpsCls(x)(__pos)
-  implicit def liftToPrimitiveMathOpsFloatOpsCls(x: Float)(implicit __pos: SourceContext) = new PrimitiveMathOpsFloatOpsCls(unit(x))(__pos)
+  implicit def repToPrimitiveMathOpsFloatOpsCls(x: Rep[Float])(implicit __pos: SourceContext):PrimitiveMathOpsFloatOpsCls = new PrimitiveMathOpsFloatOpsCls(x)(__pos)
+  implicit def liftToPrimitiveMathOpsFloatOpsCls(x: Float)(implicit __pos: SourceContext): PrimitiveMathOpsFloatOpsCls = new PrimitiveMathOpsFloatOpsCls(unit(x))(__pos)
 
 
   class PrimitiveMathOpsFloatOpsCls(val self: Rep[Float])(implicit __pos: SourceContext) {
@@ -153,8 +155,8 @@ trait PurePrimitiveOps extends OverloadHack {
     def /(rhs: Var[Long])(implicit __pos: SourceContext,__imp1: Overloaded53) = { float_divide(self, readVar(rhs).toFloat) }*/
   }
 
-  implicit def repToPrimitiveMathOpsIntOpsCls(x: Rep[Int])(implicit __pos: SourceContext) = new PrimitiveMathOpsIntOpsCls(x)(__pos)
-  implicit def liftToPrimitiveMathOpsIntOpsCls(x: Int)(implicit __pos: SourceContext) = new PrimitiveMathOpsIntOpsCls(unit(x))(__pos)
+  implicit def repToPrimitiveMathOpsIntOpsCls(x: Rep[Int])(implicit __pos: SourceContext): PrimitiveMathOpsIntOpsCls= new PrimitiveMathOpsIntOpsCls(x)(__pos)
+  implicit def liftToPrimitiveMathOpsIntOpsCls(x: Int)(implicit __pos: SourceContext): PrimitiveMathOpsIntOpsCls = new PrimitiveMathOpsIntOpsCls(unit(x))(__pos)
 
 
   class PrimitiveMathOpsIntOpsCls(val self: Rep[Int])(implicit __pos: SourceContext) {
@@ -208,8 +210,8 @@ trait PurePrimitiveOps extends OverloadHack {
     def /(rhs: Var[Long])(implicit __pos: SourceContext,__imp1: Overloaded85) = { long_divide(self.toLong, readVar(rhs)) }*/
   }
 
-  implicit def repToPrimitiveMathOpsLongOpsCls(x: Rep[Long])(implicit __pos: SourceContext) = new PrimitiveMathOpsLongOpsCls(x)(__pos)
-  implicit def liftToPrimitiveMathOpsLongOpsCls(x: Long)(implicit __pos: SourceContext) = new PrimitiveMathOpsLongOpsCls(unit(x))(__pos)
+  implicit def repToPrimitiveMathOpsLongOpsCls(x: Rep[Long])(implicit __pos: SourceContext): PrimitiveMathOpsLongOpsCls = new PrimitiveMathOpsLongOpsCls(x)(__pos)
+  implicit def liftToPrimitiveMathOpsLongOpsCls(x: Long)(implicit __pos: SourceContext):  PrimitiveMathOpsLongOpsCls = new PrimitiveMathOpsLongOpsCls(unit(x))(__pos)
 
 
   class PrimitiveMathOpsLongOpsCls(val self: Rep[Long])(implicit __pos: SourceContext) {
@@ -353,8 +355,8 @@ trait PurePrimitiveOps extends OverloadHack {
    * Float
    */
 
-  implicit def repToFloatOpsCls(x: Rep[Float])(implicit pos: SourceContext) = new FloatOpsCls(x)(pos)
-  implicit def liftToFloatOpsCls(x: Float)(implicit pos: SourceContext) = new FloatOpsCls(unit(x))(pos)
+  implicit def repToFloatOpsCls(x: Rep[Float])(implicit pos: SourceContext): FloatOpsCls= new FloatOpsCls(x)(pos)
+  implicit def liftToFloatOpsCls(x: Float)(implicit pos: SourceContext): FloatOpsCls = new FloatOpsCls(unit(x))(pos)
   //implicit def varToFloatOpsCls(x: Var[Float])(implicit pos: SourceContext) = new FloatOpsCls(readVar(x))(pos)
 
   class FloatOpsCls(val self: Rep[Float])(implicit pos: SourceContext) {

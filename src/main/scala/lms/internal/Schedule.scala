@@ -29,11 +29,16 @@ trait Schedule {
    }
 
    override def next(): self.IR.TP[_] = {
-    val t = getTrav()
-    val tps = t.scheduleoptions.map(p => t.cminfo.reifiedIR.id2tp(p._1))
+    val t = getTrav()    
+    val tps = t.scheduleoptions.map(p => t.cminfo.reifiedIR.id2tp(p._1))  
     val choice = choose(tps)
     val choice_index = tps.indexOf(choice)
-    setTrav(t.scheduleoptions(choice_index)._2())
+    t.scheduleoptions(choice_index)
+    val xx = t.scheduleoptions(choice_index)
+    val yy = xx._2
+    val u: Unit = null
+    val zz = yy.apply(u)
+    setTrav(zz)
     choice
    }
 
@@ -47,7 +52,8 @@ trait Schedule {
 
   def iterator(): Iterator[self.IR.TP[_]] = new ScheduleIterator(esc.getForwardIterator())
   def iterator(block: self.IR.Block): Iterator[self.IR.TP[_]] =
-   new ScheduleIterator(esc.getForwardIterator(block))
+   //for dotty - no idea why it doesnt like it
+   new ScheduleIterator(esc.getForwardIterator(block.asInstanceOf[esc.cminfo.reifiedIR.IR.Block]))
  }
 
 

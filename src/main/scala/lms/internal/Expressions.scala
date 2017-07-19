@@ -3,7 +3,8 @@ import scala.lms._
 
 
 import org.scala_lang.virtualized.SourceContext
-
+import scala.reflect._
+import scala.reflect.runtime.universe._
 
 
 /**
@@ -41,14 +42,14 @@ trait Expressions extends TypeRepBase with Logging{
   }
 
 
-  def unapply[T: Manifest](exp: Exp[_]) = getTP(exp) match {
+  def unapply(exp: Exp[_]) = getTP(exp) match {
    case Some(x) => x.rhs match {
     case ConstDef(y) => Some(y)
     case _ => scala.None
    }
    case None => scala.None
   }
-  def unapply[T: Manifest](rhs: Def[_]) = getTP(rhs) match {
+  def unapply(rhs: Def[_]) = getTP(rhs) match {
    case Some(x) => x.rhs match {
     case ConstDef(y) => Some(y)
     case _ => scala.None

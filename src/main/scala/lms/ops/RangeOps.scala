@@ -9,7 +9,7 @@ import util.OverloadHack
 trait RangeOps extends OverloadHack {
   this: ImplicitOps =>
   // workaround for infix not working with manifests
-  implicit def repRangeToRangeOps(r: Rep[Range]) = new rangeOpsCls(r)
+  implicit def repRangeToRangeOps(r: Rep[Range]): rangeOpsCls = new rangeOpsCls(r)
   class rangeOpsCls(r: Rep[Range]){
     //def foldLeft[B](ini: B)(f: ((B,Rep[Int])) => B) = range_foldLeft(r,ini,f)
     //def foreach[B](f: (B,Rep[Int]) => Rep[B])(implicit pos: SourceContext) = range_foldLeft(r, f)
@@ -34,13 +34,13 @@ trait RangeOpsExp extends RangeOps with BaseExp with FunctionsExp{
   def range_foldLeft[B](r: Exp[Range], ini: B, body: ((B,Exp[Int])) => B)(implicit exposeB: ExposeRep[B]): B = {
 
     val exposeTuple =  new ExposeRep[(B,Exp[Int])]() {
-      val freshExps = (u: Unit) => exposeB.freshExps() :+ Arg[Int]
-      val vec2t: Vector[Exp[_]] => (B,Exp[Int]) = (in: Vector[Exp[_]]) => {
+      def freshExps() = exposeB.freshExps() :+ Arg[Int]
+      def vec2t(in: Vector[Exp[_]]):(B,Exp[Int]) = {
         val b: B = exposeB.vec2t(in)
         val n: Exp[Int] = in.last.asInstanceOf[Rep[Int]]
         (b,n)
       }
-      val t2vec: ((B,Exp[Int])) => Vector[Exp[_]] = (in: (B,Exp[Int])) => {
+      def t2vec(in: (B,Exp[Int])): Vector[Exp[_]] =  {
         exposeB.t2vec(in._1) :+ in._2
       }
     }
@@ -58,14 +58,15 @@ trait RangeOpsExp extends RangeOps with BaseExp with FunctionsExp{
         val otp = exp2tp(fsym._1)
         val tag: TypeRep[Any] = otp.tag.asInstanceOf[TypeRep[Any]]
         val cc: Def[Any] = ReturnArg(sumnodeexp, fsym._1, fsym._2, true, newsyms.size == fsym._2 + 1)
-        val newx = toAtom(cc)(tag, null)
+        //val newx = toAtom(cc)(tag, null)
+        val newx = toAtom(cc)(null,tag)
         newx
       })
     } else {
       newsyms.zipWithIndex.map(fsym => {
         val tag: TypeRep[Any] = exp2tp(fsym._1).tag.asInstanceOf[TypeRep[Any]]
         val cc: Def[Any] = ReturnArg(sumnodeexp, fsym._1, fsym._2, false, true)
-        val newx = toAtom(cc)(tag, null)
+        val newx = toAtom(cc)(null, tag)
         newx
       })
     }

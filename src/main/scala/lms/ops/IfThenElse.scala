@@ -41,7 +41,8 @@ trait IfThenElsePureExp extends IfThenElse with BaseExp with FunctionsExp{
         val otp = exp2tp(fsym._1)
         val tag: TypeRep[Any] = otp.tag.asInstanceOf[TypeRep[Any]]
         val cc: Def[Any] = ReturnArg(ifthenelseexp, fsym._1, fsym._2, true, newsyms.size == fsym._2 + 1)
-        val newx = toAtom(cc)(tag, null)
+        val newx = toAtom(cc)(null, tag)
+        //val newx = toAtom(cc)(tag, null)
         /*if (tag.mf.toString().contains("Function")) {
           val newtp = exp2tp(newx)
           println(newtp)
@@ -52,7 +53,8 @@ trait IfThenElsePureExp extends IfThenElse with BaseExp with FunctionsExp{
       newsyms.zipWithIndex.map(fsym => {
         val tag: TypeRep[Any] = exp2tp(fsym._1).tag.asInstanceOf[TypeRep[Any]]
         val cc: Def[Any] = ReturnArg(ifthenelseexp, fsym._1, fsym._2, false, true)
-        val newx = toAtom(cc)(tag, null)
+        val newx = toAtom(cc)(null, tag)
+        //val newx = toAtom(cc)(tag, null)
         newx
       })
     }
@@ -161,9 +163,9 @@ trait IfThenElseExp extends IfThenElse with BaseExp with Effects {
 
 
   override def symsFreq(e: Any): Vector[(Exp[_], Double)] = e match {
-    case IfThenElse(c, t, e) => {
+  /*  case IfThenElse(c, t, e) => {
       freqNormal(c) ++ freqCold(t) ++ freqCold(e)
-    }
+    }*/
     case _ => super.symsFreq(e)
   }
 

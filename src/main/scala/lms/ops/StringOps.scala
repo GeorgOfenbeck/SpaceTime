@@ -7,11 +7,11 @@ import scala.lms.internal.Expressions
 import util.OverloadHack
 
 
-trait LiftString {
+/*trait LiftString {
   this: StringOpsExp =>
 
-  implicit def strToRepStr(s: String) = unit(s)
-}
+  implicit def strToRepStr(s: String): Rep[String] = unit(s)
+}*/
 
 trait StringOps extends OverloadHack {
   this: ImplicitOps =>

@@ -11,19 +11,19 @@ import scala.reflect.runtime.universe._
  */
 trait TypeRepBase {
  trait TypeRep[T] {
-  def mf: TypeTag[T]
+  def mf: ClassTag[T]
 
-  def typeArguments: List[TypeTag[_]]
-  def arrayManifest: TypeTag[Array[T]]
+  //def typeArguments: List[ClassTag[_]]
+  //def arrayManifest: ClassTag[Array[T]]
   def runtimeClass: java.lang.Class[_]
   //def erasure: java.lang.Class[_]
   //def <:<(that: TypeRep[_]): Boolean
   def dynTags: Option[ Unit => (Vector[TypeRep[_]],Vector[TypeRep[_]])]
  }
 
- case class TypeExp[T](mf: TypeTag[T], dynTags: Option[ Unit => (Vector[TypeRep[_]],Vector[TypeRep[_]])] = None) extends TypeRep[T] {
-  def typeArguments: List[TypeTag[_]]   = mf.typeArguments
-  def arrayManifest: TypeTag[Array[T]] = mf.arrayManifest
+ case class TypeExp[T](mf: ClassTag[T], dynTags: Option[ Unit => (Vector[TypeRep[_]],Vector[TypeRep[_]])] = None) extends TypeRep[T] {
+  //def typeArguments: List[ClassTag[_]]   = mf.typeArguments
+  //def arrayManifest: ClassTag[Array[T]] = mf.arrayManifest
   def runtimeClass: java.lang.Class[_] = mf.runtimeClass
   //def <:<(that: TypeRep[_]): Boolean = mf.<:<(that.mf)
   //def erasure: java.lang.Class[_] = mf.erasure
@@ -34,8 +34,8 @@ trait TypeRepBase {
  }
 
  def typeRep[T](implicit tr: TypeRep[T]): TypeRep[T] = tr
- implicit def typeRepFromManifest[T](implicit mf: TypeTag[T]): TypeRep[T] = TypeExp(mf)
- implicit def convertFromManifest[T](mf: TypeTag[T]): TypeRep[T] = TypeExp(mf)
+ implicit def typeRepFromManifest[T](implicit mf: ClassTag[T]): TypeRep[T] = TypeExp(mf)
+ implicit def convertFromManifest[T](mf: ClassTag[T]): TypeRep[T] = TypeExp(mf)
 }
 
 
@@ -51,11 +51,8 @@ trait Base extends TypeRepBase {
  protected def unit[T:TypeRep](x: T): Rep[T]            //TODO - why protected??
 
  // always lift Unit and Null (for now)
- implicit def unitToRepUnit(x: Unit): Rep[Unit] = {
-  val tr = typeRep[Unit]
-  unit(x)(tr)
- }
- implicit def nullToRepNull(x: Null): Rep[Null] = unit(x)
+ implicit def unitToRepUnit(x: Unit): Rep[Unit] = unit(x)
+ //implicit def nullToRepNull(x: Null): Rep[Null] = unit(x)
  def typeRep[T](implicit tr: TypeRep[T]): TypeRep[T]
 
 
@@ -75,9 +72,9 @@ trait BaseExp extends Base with Functions with Blocks { //with Effects{
 
 
  implicit def exposeRepFromRep[T](implicit tag: TypeRep[T]): ExposeRep[Rep[T]] = new ExposeRep[Exp[T]](){
-  val freshExps = (u: Unit) => Vector(Arg[T](tag))
-  val vec2t: Vector[Exp[_]] => Exp[T] = (v: Vector[Exp[_]]) => v.head.asInstanceOf[Exp[T]] //TODO: Horrible cast - get rid of it
-  val t2vec: Exp[T] => Vector[Exp[T]] = (x: Rep[T]) => Vector(x)
+  def freshExps() = Vector(Arg[T](tag))
+  def vec2t(v: Vector[Exp[_]]) = v.head.asInstanceOf[Exp[T]] //TODO: Horrible cast - get rid of it
+  def t2vec(x: Rep[T]) = Vector(x)
  }
 }
 

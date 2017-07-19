@@ -115,7 +115,7 @@ trait GenericCodegen extends Emit[Vector[String]]{
       case xs: Seq[_] => xs.map(quoteOrRemap).mkString(",")
       //case tp: TP[_] => quote(tp)
       case exp: Exp[_] => quote(exp)
-      case m: TypeTag[_] => remap(m)
+      case m: ClassTag[_] => remap(m)
       case s: String => s
       case _ => throw new RuntimeException(s"Could not quote or remap $arg")
     }
@@ -149,23 +149,25 @@ trait GenericCodegen extends Emit[Vector[String]]{
 
   // optional type remapping (default is identity)
   def remap(s: String): String = s
-  def remap[A](s: String, method: String, t: TypeTag[A]) : String = remap(s, method, t.toString)
+  def remap[A](s: String, method: String, t: ClassTag[A]) : String = remap(s, method, t.toString)
   def remap(s: String, method: String, t: String) : String = s + method + "[" + remap(t) + "]"
-  def remap[A](m: TypeTag[A]): String = m match {
+  def remap[A](m: ClassTag[A]): String = m match {
      //TODO: GO -> check with Vojin / Tiark - this got lost in the macro-trans - do we care?
     //case rm: RefinedManifest[A] =>  "AnyRef{" + rm.fields.foldLeft(""){(acc, f) => {val (n,mnf) = f; acc + "val " + n + ": " + remap(mnf) + ";"}} + "}"
     //case _ if m.erasure == classOf[Variable[Any]] =>
 //      remap(m.typeArguments.head)
     case _ =>
       // call remap on all type arguments
-      val targs = m.typeArguments
+      assert(false,"no type arguments due to classtag")
+      /*val targs = m.typeArguments
       if (targs.length > 0) {
         val ms = m.toString
         ms.take(ms.indexOf("[")+1) + targs.map(tp => remap(tp)).mkString(", ") + "]"
       }
-      else m.toString
+      else m.toString*/
+      ???
   }
-  def remapImpl[A](m: TypeTag[A]): String = remap(m)
+  def remapImpl[A](m: ClassTag[A]): String = remap(m)
 
 
 }

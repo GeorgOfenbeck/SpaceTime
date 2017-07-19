@@ -32,7 +32,7 @@ trait CLikeCodegen extends GenericCodegen with Config {
     else ""
   }
 
-  def remapWithRef[A](m: TypeTag[A]): String = remap(m) + addRef(m)
+  def remapWithRef[A](m: ClassTag[A]): String = remap(m) + addRef(m)
   def remapWithRef(tpe: String): String = tpe + addRef(tpe)
   def isPrimitiveType(tpe: String) : Boolean = {
     tpe match {
@@ -46,7 +46,7 @@ trait CLikeCodegen extends GenericCodegen with Config {
   }
 
   def addRef(): String = if (cppMemMgr=="refcnt") " " else " *"
-  def addRef[A](m: TypeTag[A]): String = addRef(remap(m))
+  def addRef[A](m: ClassTag[A]): String = addRef(remap(m))
   def addRef(tpe: String): String = {
     if (!isPrimitiveType(tpe) && !isVoidType(tpe)) addRef()
     else " "
@@ -167,7 +167,8 @@ trait EmitHeadInternalFunctionAsCMain extends CLikeCodegen {
       case IR.TypeExp(mf,dyntags) => {
         dyntags match {
           case Some(f) => {
-            val (args,returns) = f()
+            val u: Unit = null
+            val (args,returns) = f(u)
             val rargs = args.map(a => remap(a))
             val rrets = returns.map(r => remap(r))
             val a = tupledeclarehelper(rargs, "")
@@ -280,8 +281,9 @@ trait EmitHeadInternalFunctionAsCMain extends CLikeCodegen {
     case IR.Reflect(a,b,c) => {
       tp match {
         case tpm@IR.TP(sym,IR.Reflect(x,summary,deps),tag) => {
-          val t = tpm.copy(rhs = x)
-          emitNode(t,acc,block_callback)
+          //val t = tpm.copy(rhs = x)
+          val tp = IR.def2tp(x)
+          emitNode(tp,acc,block_callback)
         }
         case _ => {
           assert(false, "this should be unreachable")

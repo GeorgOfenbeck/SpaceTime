@@ -9,8 +9,8 @@ import util.OverloadHack
 
 trait OrderingOps extends Base with OverloadHack {
  // workaround for infix not working with implicits in PrimitiveOps
- implicit def orderingToOrderingOps[T:Ordering:Manifest](n: T) = new OrderingOpsCls(unit(n))
- implicit def repOrderingToOrderingOps[T:Ordering:Manifest](n: Rep[T]) = new OrderingOpsCls(n)
+ implicit def orderingToOrderingOps[T:Ordering:Manifest](n: T):  OrderingOpsCls[T] = new OrderingOpsCls(unit(n))
+ implicit def repOrderingToOrderingOps[T:Ordering:Manifest](n: Rep[T]):  OrderingOpsCls[T] = new OrderingOpsCls(n)
 // implicit def varOrderingToOrderingOps[T:Ordering:Manifest](n: Var[T]) = new OrderingOpsCls(readVar(n))
 
  class OrderingOpsCls[T:Ordering:Manifest](lhs: Rep[T]){

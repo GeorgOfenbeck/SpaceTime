@@ -118,7 +118,7 @@ trait Effects extends Functions with Blocks with Logging {
   // --- summary
 
 
-  def reflectMutable[A: TypeTag](d: Def[A])(implicit pos: SourceContext): Exp[A] = {
+  def reflectMutable[A: ClassTag](d: Def[A])(implicit pos: SourceContext): Exp[A] = {
     val z = reflectEffect(d, Alloc())
     val mutableAliases = mutableTransitiveAliases(d)
     checkIllegalSharing(z, mutableAliases)
@@ -240,7 +240,7 @@ trait Effects extends Functions with Blocks with Logging {
       val zd = Reflect(x, u, depexps)
       if (mustIdempotent(u)) {
         ??? //Check this!
-        context find { case Def(d) => d == zd } map {
+/*        context find { case Def(d) => d == zd } map {
           _.asInstanceOf[Exp[A]]
         } getOrElse {
           //        findDefinition(zd) map (_.sym) filter (context contains _) getOrElse { // local cse TODO: turn around and look at context first??
@@ -252,7 +252,7 @@ trait Effects extends Functions with Blocks with Logging {
               printlog("depends on  " + w)
           }
           createReflectDefinition(z, zd)
-        }
+        }*/
       } else {
         val z = fresh[A](Vector(pos))
         // make sure all writes go to allocs
@@ -447,7 +447,7 @@ trait Effects extends Functions with Blocks with Logging {
   }
 
 
-  def reflectWrite[A: Manifest](write0: Exp[Any]*)(d: Def[A])(implicit pos: SourceContext): Exp[A] = {
+  def reflectWrite[A: ClassTag](write0: Exp[Any]*)(d: Def[A])(implicit pos: SourceContext): Exp[A] = {
     val write = write0.toVector.asInstanceOf[Vector[Exp[_]]] // should check...
     val z = reflectEffect(d, Write(write))
     val mutableAliases = mutableTransitiveAliases(d) filterNot (write contains _)

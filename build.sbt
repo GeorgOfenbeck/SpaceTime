@@ -11,7 +11,7 @@ scalaSource in Compile <<= baseDirectory(_ / "src/main")
 
 scalaSource in Test <<= baseDirectory(_ / "src/test")
 
-libraryDependencies += "org.scala-lang" % "scala-compiler" % scalaVersion.value
+libraryDependencies += ("org.scala-lang" % "scala-compiler" % "2.11.11").withDottyCompat()
 
 libraryDependencies += "org.scala-lang" % "scala-library" % scalaVersion.value
 

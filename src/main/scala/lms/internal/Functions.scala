@@ -7,9 +7,9 @@ import scala.virtualization.lms.util.ClosureCompare
 trait ExposeRepBase extends Expressions {
 
   trait ExposeRep[T] {
-    val freshExps: Unit => Vector[Exp[_]]
-    val vec2t: Vector[Exp[_]] => T
-    val t2vec: T => Vector[Exp[_]]
+    def freshExps(): Vector[Exp[_]]
+    def vec2t(v: Vector[Exp[_]]): T
+    def t2vec(t: T): Vector[Exp[_]]
   }
 
 }
@@ -41,7 +41,7 @@ trait Functions extends Base with ExposeRepBase {
 
   case class StagedFunction[A, R](f: A => R, exp: Rep[_ => _], args: ExposeRep[A], returns: ExposeRep[R], name: Option[String] = None)
 
-  implicit def toLambdaOps[A, R](fun: StagedFunction[A, R]) = new LambdaOps(fun)
+  implicit def toLambdaOps[A, R](fun: StagedFunction[A, R]): LambdaOps[A, R] = new LambdaOps(fun)
 
   class LambdaOps[A, R](f: StagedFunction[A, R]) {
     def apply(x: A): R = doApplySF(f, x, f.args, f.returns)
@@ -56,12 +56,13 @@ trait FunctionsExp extends Functions with BaseExp with ClosureCompare with Effec
 
   implicit def exposeFunction[A, R](implicit args: ExposeRep[A], returns: ExposeRep[R]): ExposeRep[StagedFunction[A, R]] =
     new ExposeRep[StagedFunction[A, R]]() {
-      val freshExps: Unit => Vector[Exp[_]] = (u: Unit) => {
+      def freshExps(): Vector[Exp[_]] = {
         def helper[T]()(implicit tag: TypeRep[T]): TypeRep[T] = {
           tag match {
             case x@TypeExp(mf, dynTags) => {
               val f: Unit => (Vector[TypeRep[_]], Vector[TypeRep[_]]) = (u: Unit) => {
-                val a = args.freshExps().map(ele => exp2tp(ele).tag)
+                val t = args.freshExps()
+                val a = t.map(ele => exp2tp(ele).tag)
                 val r = returns.freshExps().map(ele => exp2tp(ele).tag)
                 (a, r)
               }
@@ -73,15 +74,15 @@ trait FunctionsExp extends Functions with BaseExp with ClosureCompare with Effec
             }
           }
         }
-        val tagnew = helper[Any => Any]
+        val tagnew = helper[Any => Any]()
         val lambda: Exp[Function[Any, Any]] = Arg[Any => Any](tagnew)
         Vector(lambda)
       }
-      val vec2t: Vector[Exp[_]] => StagedFunction[A, R] = (in: Vector[Exp[_]]) => {
+      def vec2t(in: Vector[Exp[_]]): StagedFunction[A, R] = {
         val f: (A => R) = (ina: A) => ???
         StagedFunction(f, in.head.asInstanceOf[Rep[_ => _]], args, returns)
       }
-      val t2vec: StagedFunction[A, R] => Vector[Exp[_]] = (in: StagedFunction[A, R]) => {
+      def t2vec(in: StagedFunction[A, R]): Vector[Exp[_]] = {
         Vector(in.exp)
       }
     }
@@ -162,14 +163,16 @@ trait FunctionsExp extends Functions with BaseExp with ClosureCompare with Effec
         val otp = exp2tp(fsym._1)
         val tag: TypeRep[Any] = otp.tag.asInstanceOf[TypeRep[Any]]
         val cc: Def[Any] = ReturnArg(applynodeexp, fsym._1, fsym._2, true, newsyms.size == fsym._2 + 1)
-        val newx = toAtom(cc)(tag, null)
+        //val newx = toAtom(cc)(tag, null)
+        val newx = toAtom(cc)(null,tag)
         newx
       })
     } else {
       newsyms.zipWithIndex.map(fsym => {
         val tag: TypeRep[Any] = exp2tp(fsym._1).tag.asInstanceOf[TypeRep[Any]]
         val cc: Def[Any] = ReturnArg(applynodeexp, fsym._1, fsym._2, false, true)
-        val newx = toAtom(cc)(tag, null)
+        val newx = toAtom(cc)(null,tag)
+        //val newx = toAtom(cc)(tag, null)
         newx
       })
     }
@@ -287,8 +290,8 @@ trait FunctionsExp extends Functions with BaseExp with ClosureCompare with Effec
 
   override def symsFreq(e: Any): Vector[(Exp[_], Double)] = e match {
     case TP(sym, rhs, tag) => rhs match {
-      case InternalLambda(f, x, y, hot, args, returns) => if (hot) freqHot(sym) else freqCold(sym)
-      case ExternalLambda(f, x, y, hot, args, returns, global, name) => if (hot) freqHot(sym) else freqCold(sym)
+      //case InternalLambda(f, x, y, hot, args, returns) => if (hot) freqHot(sym) else freqCold(sym)
+      //case ExternalLambda(f, x, y, hot, args, returns, global, name) => if (hot) freqHot(sym) else freqCold(sym)
       case _ => super.symsFreq(e)
     }
     case _ => super.symsFreq(e)

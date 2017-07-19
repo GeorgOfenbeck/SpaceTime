@@ -10,8 +10,8 @@ trait VectorOps extends Base with OverloadHack {
   // multiple definitions needed because implicits won't chain
   // not using infix here because apply doesn't work with infix methods
   //implicit def varToArrayOps[T:Manifest](x: Var[Array[T]]) = new ArrayOpsCls(readVar(x))
-  implicit def repVectorToVectorOps[T:Manifest](a: Rep[Vector[T]]) = new VectorOpsCls(a)
-  implicit def vectorToVectorOps[T:Manifest](a: Vector[T]) = new VectorOpsCls(unit(a))
+  implicit def repVectorToVectorOps[T:Manifest](a: Rep[Vector[T]]):VectorOpsCls[T] = new VectorOpsCls(a)
+  implicit def vectorToVectorOps[T:Manifest](a: Vector[T]):VectorOpsCls[T] = new VectorOpsCls(unit(a))
 
   // substitution for "new Array[T](...)"
 
