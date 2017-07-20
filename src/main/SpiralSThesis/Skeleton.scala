@@ -1,6 +1,8 @@
 package SpiralSThesis
 
 import org.scala_lang.virtualized.SourceContext
+import scala.reflect._
+import scala.reflect.runtime.universe._
 
 trait Skeleton extends Spiral_DSL{
 
@@ -35,7 +37,7 @@ trait Skeleton extends Spiral_DSL{
   }
 
   trait isRepBase extends RepBase[Rep] {
-    val isRep = true
+    override def isRep() = true
 
     def const[A: TypeRep](x: A): Rep[A] = Const(x)
 
@@ -55,7 +57,7 @@ trait Skeleton extends Spiral_DSL{
   }
 
   trait noRepBase extends RepBase[NoRep] {
-    val isRep = false
+    override def isRep() = false
 
     def const[A: TypeRep](x: A): NoRep[A] = x
 
@@ -74,32 +76,32 @@ trait Skeleton extends Spiral_DSL{
 
 
   trait Comparisons[T[_]] {
-    implicit def mkComparisonOps[A: Ordering : Manifest](lhs: T[A]): Ops[A] = new Ops[A](lhs)
+    implicit def mkComparisonOps[A: Ordering : ClassTag](lhs: T[A]): Ops[A] = new Ops[A](lhs)
 
-    class Ops[A: Ordering : Manifest](lhs: T[A]) {
+    class Ops[A: Ordering : ClassTag](lhs: T[A]) {
       def ==(rhs: T[A]): T[Boolean] = equiv(lhs, rhs)
 
       def <(rhs: T[A]): T[Boolean] = less(lhs, rhs)
     }
 
-    def equiv[A: Ordering : Manifest](lhs: T[A], rhs: T[A]): T[Boolean]
+    def equiv[A: Ordering : ClassTag](lhs: T[A], rhs: T[A]): T[Boolean]
 
-    def less[A: Ordering : Manifest](lhs: T[A], rhs: T[A]): T[Boolean]
+    def less[A: Ordering : ClassTag](lhs: T[A], rhs: T[A]): T[Boolean]
   }
 
 
 
 
   trait RepComparisons extends Comparisons[Rep] {
-    def equiv[T: Ordering : Manifest](lhs: Rep[T], rhs: Rep[T]): Rep[Boolean] = ordering_equiv(lhs, rhs)
+    def equiv[T: Ordering : ClassTag](lhs: Rep[T], rhs: Rep[T]): Rep[Boolean] = ordering_equiv(lhs, rhs)
 
-    def less[T: Ordering : Manifest](lhs: Rep[T], rhs: Rep[T]): Rep[Boolean] = ordering_lt(lhs, rhs)
+    def less[T: Ordering : ClassTag](lhs: Rep[T], rhs: Rep[T]): Rep[Boolean] = ordering_lt(lhs, rhs)
   }
 
   trait NoRepComparisons extends Comparisons[NoRep] {
-    def equiv[T: Ordering : Manifest](lhs: NoRep[T], rhs: NoRep[T]): NoRep[Boolean] = lhs == rhs
+    def equiv[T: Ordering : ClassTag](lhs: NoRep[T], rhs: NoRep[T]): NoRep[Boolean] = lhs == rhs
 
-    def less[T: Ordering : Manifest](lhs: NoRep[T], rhs: NoRep[T]): NoRep[Boolean] = implicitly[Ordering[T]].lt(lhs, rhs)
+    def less[T: Ordering : ClassTag](lhs: NoRep[T], rhs: NoRep[T]): NoRep[Boolean] = implicitly[Ordering[T]].lt(lhs, rhs)
   }
 
   trait Conditionals[T[_]] {
@@ -118,9 +120,9 @@ trait Skeleton extends Spiral_DSL{
 
 
   trait StagedNum[T[_]] extends RepBase[T] {
-    implicit def mkNumericOps(lhs: T[Int]): Ops = new Ops(lhs)
+    implicit def mkNumericOps(lhs: T[Int]): NumOps = new NumOps(lhs)
 
-    class Ops(lhs: T[Int]) {
+    class NumOps(lhs: T[Int]) {
 
       def +(rhs: T[Int]) = plus(lhs, rhs)
 

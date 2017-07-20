@@ -10,9 +10,9 @@ import scala.tools.nsc.io._
 import scala.tools.nsc.interpreter.AbstractFileClassLoader
 
 trait ScalaCompile {
-  /*
-  val codegen: ScalaCodegen with TupleHelper
 
+  val codegen: ScalaCodegen with TupleHelper
+/*
   var compiler: Global = _
   var reporter: ConsoleReporter = _
 

@@ -18,6 +18,7 @@ class CorewGlue(testsize: Int, radix_choice: Map[Int, Int], static_size: Option[
   val maxwarmup = if (testsize < 8) 1000 else 10
   val threads = 8
 
+  //var reporter: ConsoleReporter = null
   def iniGTSkeleton(precomp: Boolean): Stat = {
     val idIM: StatIMH = new StatIMH(0, 1, 0)
     val dynIM = new StatIMH(sph(), sph(), sph())
@@ -28,7 +29,7 @@ class CorewGlue(testsize: Int, radix_choice: Map[Int, Int], static_size: Option[
     t
   }
 
-  def compile(): (Unit => Double) = {
+  /*def compile(): (Unit => Double) = {
     import scala.tools.nsc._
     import scala.tools.nsc.io._
     import scala.tools.nsc.reporters._
@@ -121,18 +122,21 @@ class CorewGlue(testsize: Int, radix_choice: Map[Int, Int], static_size: Option[
     }
 
     f
-  }
+  }*/
 
   def codeexport(path: String = "C:\\Phd\\git\\code\\SpiralSTarget\\src\\main\\Test.scala") = {
     //def codeexport(path: String = "F:\\Phd\\git\\code\\SpiralSTarget\\src\\main\\Test.scala") = {
     val stream2 = new java.io.PrintWriter(new java.io.FileOutputStream(path))
     dumpCode(stream2)
     val ingt = iniGTSkeleton(false)
-    val esc = codegen.emitSource((ini(ingt)), "testClass", stream2)(exposeDyn(ingt), ingt.expdata)
+    val aexp: CorewGlue.this.codegen.IR.ExposeRep[CorewGlue.this.Dyn] = exposeDyn(ingt).asInstanceOf[CorewGlue.this.codegen.IR.ExposeRep[CorewGlue.this.Dyn]]
+    val rexp: CorewGlue.this.codegen.IR.ExposeRep[CorewGlue.this.Data] = ingt.expdata.asInstanceOf[ CorewGlue.this.codegen.IR.ExposeRep[CorewGlue.this.Data]]
+    val esc = codegen.emitSource((ini(ingt)), "testClass", stream2)(aexp, rexp)
     stream2.println("\n}\n")
     if (twid_default_precomp) {
       val ingtpre = iniGTSkeleton(true)
-      val esc2 = codegen.emitSource((ini(ingtpre)), "PreCompute", stream2)(exposeDyn(ingtpre), ingt.expdata)
+      val bexp: CorewGlue.this.codegen.IR.ExposeRep[CorewGlue.this.Dyn] = exposeDyn(ingtpre).asInstanceOf[CorewGlue.this.codegen.IR.ExposeRep[CorewGlue.this.Dyn]]
+      val esc2 = codegen.emitSource((ini(ingtpre)), "PreCompute", stream2)(bexp, rexp)
     }
     stream2.println("\n}}\n")
     stream2.flush()
@@ -145,7 +149,9 @@ class CorewGlue(testsize: Int, radix_choice: Map[Int, Int], static_size: Option[
     val stream2 = new java.io.PrintWriter(new java.io.FileOutputStream(path + name))
     //dumpCode (stream2)
     val ingt = iniGTSkeleton(false)
-    val (str, esc) = emitGraph.emitDepGraphf(ini(ingt))(exposeDyn(ingt), ingt.expdata)
+    val aexp: CorewGlue.this.emitGraph.IR.ExposeRep[CorewGlue.this.Dyn] = exposeDyn(ingt).asInstanceOf[CorewGlue.this.emitGraph.IR.ExposeRep[CorewGlue.this.Dyn]]
+    val rexp: CorewGlue.this.emitGraph.IR.ExposeRep[CorewGlue.this.Data] = ingt.expdata.asInstanceOf[CorewGlue.this.emitGraph.IR.ExposeRep[CorewGlue.this.Data]]
+    val (str, esc) = emitGraph.emitDepGraphf(ini(ingt))(aexp, rexp)
     stream2.println(str)
     stream2.flush()
     stream2.close()

@@ -85,14 +85,16 @@ trait Spiral_DSL extends BaseExp with FunctionsExp with OrderingOpsExp with Bool
         val otp = exp2tp(fsym._1)
         val tag: TypeRep[Any] = otp.tag.asInstanceOf[TypeRep[Any]]
         val cc: Def[Any] = ReturnArg(sumnodeexp, fsym._1, fsym._2, true, newsyms.size == fsym._2 + 1)
-        val newx = toAtom(cc)(tag, null)
+        //val newx = toAtom(cc)(tag, null)
+        val newx = toAtom(cc)(null,tag)
         newx
       })
     } else {
       newsyms.zipWithIndex.map(fsym => {
         val tag: TypeRep[Any] = exp2tp(fsym._1).tag.asInstanceOf[TypeRep[Any]]
         val cc: Def[Any] = ReturnArg(sumnodeexp, fsym._1, fsym._2, false, true)
-        val newx = toAtom(cc)(tag, null)
+        //val newx = toAtom(cc)(tag, null)
+        val newx = toAtom(cc)(null,tag)
         newx
       })
     }

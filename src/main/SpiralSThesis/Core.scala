@@ -43,8 +43,9 @@ class Core(val radix_choice: Map[Int, Int], val interleaved: Boolean = false, va
 
   def unroll(mix: Mix): Boolean = {
     if (mix.lb.ev.isRep() || mix.n.ev.isRep()) false else {
-      val i = basecase_size.getOrElse(0) + 1
-      val t = mix.n.ev.less(mix.n.a, mix.n.ev.const(i))
+      val i: Int = basecase_size.getOrElse(0) + 1
+      val ii = mix.n.ev.const(i)
+      val t = mix.n.ev.less(mix.n.a, ii)
       t match {
         case b: Boolean => b
         case _ => false
@@ -90,7 +91,7 @@ class Core(val radix_choice: Map[Int, Int], val interleaved: Boolean = false, va
       }
       })
     }
-    if (doinline) MaybeSFunction(stageme) else MaybeSFunction(doGlobalLambda(stageme, Some("F2" + stat.toSig()), Some("F2" + stat.toName()))(expose, stat.expdata))
+    if (doinline) MaybeSFunction(stageme) else MaybeSFunction.apply(doGlobalLambda(stageme, Some("F2" + stat.toSig()), Some("F2" + stat.toName()))(expose, stat.expdata))
   }
 
   def fuseIM(r: IMHBase, s: IMHBase, lv: AInt): IMH = IMH((r.base + (r.s0 * s.base)) + r.s1 * lv, r.s0 * s.s0, (toOE(0) + (r.s0 * s.s1)))
@@ -146,7 +147,7 @@ class Core(val radix_choice: Map[Int, Int], val interleaved: Boolean = false, va
       }
       })
     }
-    if (doinline) MaybeSFunction(stageme) else MaybeSFunction(doGlobalLambda(stageme, Some("DFT_CT" + stat.toSig()), Some("DFT_CT" + stat.toName()))(expose, stat.expdata))
+    if (doinline) MaybeSFunction(stageme) else MaybeSFunction.apply(doGlobalLambda(stageme, Some("DFT_CT" + stat.toSig()), Some("DFT_CT" + stat.toName()))(expose, stat.expdata))
   }
 
   def binsearch2pow(mix: Mix, check: Rep[Int], low: Int, high: Int): Data = {
@@ -190,7 +191,7 @@ class Core(val radix_choice: Map[Int, Int], val interleaved: Boolean = false, va
         )
       }
     }
-    if (doinline) MaybeSFunction(stageme) else MaybeSFunction(doGlobalLambda(stageme, Some("DFT" + stat.toSig()), Some("DFT" + stat.toName()))(expose, stat.expdata))
+    if (doinline) MaybeSFunction(stageme) else MaybeSFunction.apply(doGlobalLambda(stageme, Some("DFT" + stat.toSig()), Some("DFT" + stat.toName()))(expose, stat.expdata))
   }
 
   def ini(stat: Stat): (Dyn => Data) = (dyn: Dyn) => {

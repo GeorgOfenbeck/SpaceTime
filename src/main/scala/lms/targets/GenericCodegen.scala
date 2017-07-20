@@ -158,14 +158,17 @@ trait GenericCodegen extends Emit[Vector[String]]{
 //      remap(m.typeArguments.head)
     case _ =>
       // call remap on all type arguments
-      assert(false,"no type arguments due to classtag")
+      //assert(false,"no type arguments due to classtag")
       /*val targs = m.typeArguments
       if (targs.length > 0) {
         val ms = m.toString
         ms.take(ms.indexOf("[")+1) + targs.map(tp => remap(tp)).mkString(", ") + "]"
       }
-      else m.toString*/
-      ???
+      else
+      ???*/
+
+       m.toString
+
   }
   def remapImpl[A](m: ClassTag[A]): String = remap(m)
 

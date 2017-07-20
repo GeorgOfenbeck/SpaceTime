@@ -1,6 +1,8 @@
 package SpiralSThesis
 
 import org.scala_lang.virtualized.SourceContext
+import scala.reflect._
+import scala.reflect.runtime.universe._
 
 trait Header extends Skeleton {
 
@@ -23,17 +25,17 @@ trait Header extends Skeleton {
 
 
   val exposeComplexVector = new ExposeRep[Data]() {
-    val freshExps = (u: Unit) => Vector(Arg[ComplexVector])
-    val vec2t: Vector[Exp[_]] => SComplexVector = (in: Vector[Exp[_]]) => SComplexVector(in.head.asInstanceOf[Rep[ComplexVector]])
-    val t2vec: Data => Vector[Exp[_]] = (in: Data) => in match {
+    def freshExps() =  Vector(Arg[ComplexVector])
+    def vec2t(in: Vector[Exp[_]]): SComplexVector = SComplexVector(in.head.asInstanceOf[Rep[ComplexVector]])
+    def t2vec(in: Data): Vector[Exp[_]] = in match {
       case v: SComplexVector => Vector(v.d)
       case _ => ???
     }
   }
   val exposeInterleavedComplexVector = new ExposeRep[Data]() {
-    val freshExps = (u: Unit) => Vector(Arg[Array[Double]])
-    val vec2t: Vector[Exp[_]] => InterleavedComplexVector = (in: Vector[Exp[_]]) => InterleavedComplexVector(in.head.asInstanceOf[Rep[Array[Double]]])
-    val t2vec: Data => Vector[Exp[_]] = (in: Data) => in match {
+    def freshExps() = Vector(Arg[Array[Double]])
+    def vec2t(in: Vector[Exp[_]]): InterleavedComplexVector = InterleavedComplexVector(in.head.asInstanceOf[Rep[Array[Double]]])
+    def t2vec(in: Data): Vector[Exp[_]] = in match {
       case v: InterleavedComplexVector => Vector(v.d)
       case _ => ???
     }
@@ -84,7 +86,7 @@ trait Header extends Skeleton {
       case (me: SComplexVector, e: SComplex) => me.updatex(i, e)
       case (me: InterleavedComplexVector, e: InterleavedComplex) => me.updatex(i, e)
       case (me: ScalarVector, e: InterleavedComplex) => me.updatex(i, e)
-      case (me: SComplexVector, e: InterleavedComplex) => me.updatex(i, new SComplex(compcreate(e.re, e.im)))
+      case (me: SComplexVector, e: InterleavedComplex) => me.updatex(i, new SComplex(compcreate(e.re(), e.im())))
       case (me: ScalarVector, e: SComplex) => me.update(i, new InterleavedComplex(e.re(),e.im()))
       case _ => {
         ???
@@ -133,17 +135,20 @@ trait Header extends Skeleton {
   }
 
 
-  case class InterleavedComplex(re: Exp[Double], im: Exp[Double]) extends DataEle {
+  case class InterleavedComplex(rex: Exp[Double], imx: Exp[Double]) extends DataEle {
 
 
+    def re(): Exp[Double] = rex
+
+    def im(): Exp[Double] = imx
 
     def create(re: Exp[Double], im: Exp[Double]): InterleavedComplex = InterleavedComplex(re, im)
 
-    def dplus(x: InterleavedComplex, y: InterleavedComplex): InterleavedComplex = InterleavedComplex(x.re + y.re, x.im + y.im)
+    def dplus(x: InterleavedComplex, y: InterleavedComplex): InterleavedComplex = InterleavedComplex(x.re() + y.re(), x.im() + y.im())
 
-    def dminus(x: InterleavedComplex, y: InterleavedComplex): InterleavedComplex = InterleavedComplex(x.re - y.re, x.im - y.im)
+    def dminus(x: InterleavedComplex, y: InterleavedComplex): InterleavedComplex = InterleavedComplex(x.re() - y.re(), x.im() - y.im())
 
-    def dtimes(x: InterleavedComplex, y: InterleavedComplex): InterleavedComplex = InterleavedComplex(x.re * y.re - x.im * y.im, x.re * y.im + x.im * y.re)
+    def dtimes(x: InterleavedComplex, y: InterleavedComplex): InterleavedComplex = InterleavedComplex(x.re() * y.re() - x.im() * y.im(), x.re() * y.im() + x.im() * y.re())
   }
 
   case class InterleavedComplexVector(d: Exp[Array[Double]]) extends Data {
@@ -161,8 +166,8 @@ trait Header extends Skeleton {
 
     def updatex(i: AInt, y: InterleavedComplex): Data = {
       val t = i.ev.toRep(i.a)
-      val re = dvecupdate(d, (2 * t), y.re)
-      val im = dvecupdate(re, (2 * t + 1), y.im)
+      val re = dvecupdate(d, (2 * t), y.re())
+      val im = dvecupdate(re, (2 * t + 1), y.im())
       InterleavedComplexVector(im)
     }
 
@@ -199,8 +204,8 @@ trait Header extends Skeleton {
           ??? /* this should not occur */
         }, fb => {
           val t = fb
-          val re = d.update((2 * t), y.re)
-          val im = d.update((2 * t + 1), y.im)
+          val re = d.update((2 * t), y.re())
+          val im = d.update((2 * t + 1), y.im())
           this
         })
 
@@ -274,23 +279,23 @@ trait Header extends Skeleton {
       }
     }
 
-    def makeSome(me: OneEntry) = {
+    def makeSome[S](me: OneEntry{ type T = S}): OptionalEntry { type T = S} = {
       new OptionalEntry {
-        override type A[X] = me.A[X]
-        override type T = me.T
-        override val evnum: Numeric[T] = me.evnum
-        override val ev: IRep[A] = me.ev
-        override val a: Option[A[T]] = Some(me.a)
-        override val evtyp = me.evtyp
+        type A[_] = me.A[_]
+        type T = S
+        val evnum: Numeric[T] = me.evnum
+        val ev: IRep[A] = me.ev.asInstanceOf[IRep[A]]
+        val a: Option[A[T]] = Some(me.a)
+        val evtyp = me.evtyp
       }
     }
 
-    def makeNone(me: OneEntry) = {
+    def makeNone[S](me: OneEntry{ type T = S}): OptionalEntry { type T = S} = {
       new OptionalEntry {
         override type A[X] = me.A[X]
         override type T = me.T
         override val evnum: Numeric[T] = me.evnum
-        override val ev: IRep[A] = me.ev
+        val ev: IRep[A] = me.ev.asInstanceOf[IRep[A]]
         override val a: Option[A[T]] = None
         override val evtyp = me.evtyp
       }
@@ -316,10 +321,10 @@ trait Header extends Skeleton {
     def toOneEntry(): Option[OneEntry {type T = self.T}] = {
       if (a.isDefined)
         Some(new OneEntry {
-          override type A[X] = self.A[X]
+          override type A[_] = self.A[_]
           override type T = self.T
           override val evnum: Numeric[T] = self.evnum
-          override val ev: IRep[A] = self.ev
+          val ev: IRep[A] = self.ev.asInstanceOf[IRep[A]]
           override val a: A[T] = self.a.get
           override val evtyp = self.evtyp
         })
@@ -333,7 +338,7 @@ trait Header extends Skeleton {
       override type A[X] = Exp[X]
       override val evnum: Numeric[Int] = implicitly[Numeric[Int]]
       override val ev: IRep[A] = cRep
-      override val evtyp: TypeRep[T] = manifest[Int]
+      override val evtyp: TypeRep[T] = classTag[Int]
       override val a: this.A[this.T] = fresh[Int]
     }
   }
@@ -345,7 +350,7 @@ trait Header extends Skeleton {
       override val evnum: Numeric[T] = null
       //ugly!!!!
       override val ev: IRep[A] = cRep
-      override val evtyp: TypeRep[T] = manifest[List[Int]]
+      override val evtyp: TypeRep[T] = classTag[List[Int]]
       override val a: this.A[this.T] = fresh[List[Int]]
     }
   }
@@ -356,7 +361,7 @@ trait Header extends Skeleton {
       override type A[X] = Exp[X]
       override val evnum: Numeric[Int] = implicitly[Numeric[Int]]
       override val ev: IRep[A] = cRep
-      override val evtyp: TypeRep[T] = manifest[Int]
+      override val evtyp: TypeRep[T] = classTag[Int]
       override val a: this.A[this.T] = x
     }
   }
@@ -368,7 +373,7 @@ trait Header extends Skeleton {
       override val evnum: Numeric[T] = null
       //ugly!!!!!
       override val ev: IRep[A] = cRep
-      override val evtyp: TypeRep[T] = manifest[List[Int]]
+      override val evtyp: TypeRep[T] = classTag[List[Int]]
       override val a: this.A[this.T] = x
     }
   }
@@ -430,7 +435,7 @@ trait Header extends Skeleton {
   trait RepSelector2 {
     val rrep: Boolean
 
-    def repselect[X](one: OneEntry {type T = X}): OptionalEntry {type T = X} =
+    def repselect[X](one: OneEntry{type T = X} ): OptionalEntry{ type T = X}  =
       if (rrep) {
         if (one.ev.isRep()) one.makeSome(one) else one.makeNone(one)
       } else if (one.ev.isRep()) one.makeNone(one) else one.makeSome(one)
@@ -477,7 +482,7 @@ trait Header extends Skeleton {
 
   object IMH {
     def apply(stat: StatIMH, dyn: DynIMH): IMH = {
-      val b = stat.getbase().toOneEntry().getOrElse(dyn.getbase().toOneEntry().get)
+      val b: OneEntry{ type T = Int} = stat.getbase().toOneEntry().getOrElse(dyn.getbase().toOneEntry().get)
       val s0 = stat.gets0().toOneEntry().getOrElse(dyn.gets0().toOneEntry().get)
       val s1 = stat.gets1().toOneEntry().getOrElse(dyn.gets1().toOneEntry().get)
       new IMH(b, s0, s1)
@@ -770,12 +775,12 @@ trait Header extends Skeleton {
 
   implicit def exposeDyn(stat: Stat): ExposeRep[Dyn] = {
     new ExposeRep[Dyn]() {
-      val freshExps: Unit => Vector[Exp[_]] = (u: Unit) => {
+      def freshExps(): Vector[Exp[_]] = {
         val t = stat.expdata.freshExps() ++ stat.expdata.freshExps() ++ stat.n.ev.fresh()(stat.n.evtyp) ++ stat.lb.ev.fresh()(stat.lb.evtyp) ++
          stat.im.freshExps() ++ stat.tw.fold[Vector[Exp[_]]](Vector.empty)(fb => fb.freshExps())
         t
       }
-      val vec2t: Vector[Exp[_]] => Dyn = (in: Vector[Exp[_]]) => {
+      def vec2t(in: Vector[Exp[_]]): Dyn = {
         def removeData(v: Vector[Exp[_]]): (Data, Vector[Exp[_]]) = {
           val d = stat.expdata.vec2t(v)
           val me = stat.expdata.t2vec(d)
@@ -797,7 +802,7 @@ trait Header extends Skeleton {
         val lb: AInt = OR2AInt(olb)
         new Dyn(x, y, n, lb, im, otw)
       }
-      val t2vec: Dyn => Vector[Exp[_]] = (in: Dyn) => {
+      def t2vec(in: Dyn): Vector[Exp[_]] = {
         in.x.t2vec() ++ in.y.t2vec() ++
           OO2Exp(in.getn()) ++
           OO2Exp(in.getlb()) ++
@@ -861,8 +866,8 @@ trait Header extends Skeleton {
   case class iData(in: Data, out: Data, i: AInt, scalars: Boolean)
 
   def exposeiData(expdata: ExposeRep[Data]) = new ExposeRep[iData]() {
-    val freshExps = (u: Unit) => Vector(Arg[Int]) ++ expdata.freshExps() ++ expdata.freshExps()
-    val vec2t: Vector[Exp[_]] => iData = (in: Vector[Exp[_]]) => {
+    def freshExps() = Vector(Arg[Int]) ++ expdata.freshExps() ++ expdata.freshExps()
+    def vec2t(in: Vector[Exp[_]]): iData = {
       val t = in(0).asInstanceOf[Rep[Int]]
       val input = expdata.vec2t(in.tail)
       val vecs = expdata.t2vec(input)
@@ -870,7 +875,7 @@ trait Header extends Skeleton {
       val output = expdata.vec2t(rest)
       iData(input, output, R2AInt(t),false)
     }
-    val t2vec: iData => Vector[Exp[_]] = (in: iData) => {
+    def t2vec(in: iData): Vector[Exp[_]] = {
       val t = Vector(in.i.ev.toRep(in.i.a))
       val input: Vector[Exp[_]] = expdata.t2vec(in.in)
       val output: Vector[Exp[_]] = expdata.t2vec(in.out)
